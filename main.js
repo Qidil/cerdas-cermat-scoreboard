@@ -1,4 +1,4 @@
-const { app, BrowserWindow } = require('electron')
+const { app, BrowserWindow, ipcMain } = require('electron')
 
 let displayWindow
 let controlWindow
@@ -8,7 +8,9 @@ function createWindow() {
     displayWindow = new BrowserWindow({
         width: 1000,
         height: 700,
-        title: 'Cerdas Cermat Scoreboard',
+        webPreferences: {
+            preload: __dirname + '/preload.js'
+        }
     })
 
     displayWindow.loadURL('http://localhost:5173/display')
@@ -17,7 +19,9 @@ function createWindow() {
     controlWindow = new BrowserWindow({
         width: 800,
         height: 600,
-        title: 'Cerdas Cermat Control',
+        webPreferences: {
+            preload: __dirname + '/preload.js'
+        }
     })
 
     controlWindow.loadURL('http://localhost:5173/control')
@@ -25,4 +29,10 @@ function createWindow() {
 
 app.whenReady().then(createWindow)
 
-require('./database')
+// IPC Listener
+ipcMain.on('update-score', (event, data) => {
+    console.log('Data dari kontrol:', data)
+
+    //kirim ke display
+    displayWindow.webContents.send('score-updated', data)
+})
