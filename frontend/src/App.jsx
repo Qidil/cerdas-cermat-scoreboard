@@ -3,37 +3,74 @@ import { useState, useEffect } from 'react'
 
 // 🖥️ DISPLAY
 function Display() {
-  const [score, setScore] = useState(0)
+  const [teams, setTeams] = useState([])
 
   useEffect(() => {
-    window.electronAPI.onScoreUpdate((data) => {
-      setScore(data.score)
+    window.electronAPI.getTeams().then(setTeams)
+
+    window.electronAPI.onTeamsUpdate((data) => {
+      setTeams(data)
     })
   }, [])
 
   return (
     <div>
       <h1>DISPLAY</h1>
-      <h2>Score: {score}</h2>
+
+      <ul>
+        {teams.map((team) => (
+          <li key={team.id}>
+            {team.name} - {team.score}
+          </li>
+        ))}
+      </ul>
     </div>
   )
 }
 
 // 🎮 CONTROL
 function Control() {
-  const [score, setScore] = useState(0)
+  const [teamName, setTeamName] = useState('')
+  const [teams, setTeams] = useState([])
 
-  const handleAdd = () => {
-    const newScore = score + 10
-    setScore(newScore)
+  //ambil data awal
+  useEffect(() => {
+    window.electronAPI.getTeams().then((data) => {
+      setTeams(data)
+    })
+    
+    window.electronAPI.onTeamsUpdate((data) => {
+      setTeams(data)
+    })
+  }, [])
 
-    window.electronAPI.sendScore({ score: newScore })
+  const handleAddTeam = () => {
+    if (!teamName) return
+
+    window.electronAPI.addTeam(teamName)
+    setTeamName('')
   }
 
   return (
     <div>
       <h1>CONTROL PANEL</h1>
-      <button onClick={handleAdd}>+10</button>
+
+      <input
+        type="text"
+        placeholder="Nama Tim"
+        value={teamName}
+        onChange={(e) => setTeamName(e.target.value)}
+      />
+
+      <button onClick={handleAddTeam}>Tambah Tim</button>
+
+      <ul>
+        {teams.map((team) => (
+          <li key={team.id}>
+            {team.name} - {team.score}
+          </li>
+        ))}
+      </ul>
     </div>
   )
 }
