@@ -93,16 +93,24 @@ ipcMain.on('update-team-score', (event, { teamId, value, type }) => {
     `UPDATE teams SET score = score ${operation} ? WHERE id = ?`,
     [value, teamId],
     function (err) {
-      if (err) {
-        console.log(err.message)
-        return
-      }
+      if (err) return
+    
+      //kirim efek perubahan skor ke display
+      const change = type === 'add' ? value : -value
 
-      // kirim update terbaru
+      displayWindow.webContents.send('score-effect', {
+        teamId,
+        change
+      })
+
       db.all(`SELECT * FROM teams`, [], (err, rows) => {
         displayWindow.webContents.send('teams-updated', rows)
         controlWindow.webContents.send('teams-updated', rows)
       })
     }
   )
+})
+
+ipcMain.on('answer-feedback', (event, type) => {
+    displayWindow.webContents.send('answer-feedback', type)
 })

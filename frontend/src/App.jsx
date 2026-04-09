@@ -4,6 +4,8 @@ import { useState, useEffect } from 'react'
 // 🖥️ DISPLAY
 function Display() {
   const [teams, setTeams] = useState([])
+  const [effect, setEffect] = useState(null)
+  const [feedback, setFeedback] = useState(null)
 
   useEffect(() => {
     window.electronAPI.getTeams().then(setTeams)
@@ -13,14 +15,57 @@ function Display() {
     })
   }, [])
 
+  useEffect(() => {
+    window.electronAPI.onScoreEffect((data) => {
+      setEffect(data)
+
+      //waktu hilang effect
+      setTimeout(() => {
+        setEffect(null)
+      }, 1000)
+    })
+  }, [])
+
+  useEffect(() => {
+    window.electronAPI.onFeedback((type) => {
+      setFeedback(type)
+
+      //waktu hilang feedback
+      setTimeout(() => {
+        setFeedback(null)
+      }, 1000)
+    })
+  }, [])
+
   return (
-    <div>
+    <div
+      style={{
+        backgroundColor:
+          feedback === 'correct'
+            ? 'green'
+            : feedback === 'wrong'
+            ? 'red'
+            : 'white',
+        height: '100vh'
+  }}
+    >
       <h1>DISPLAY</h1>
 
       <ul>
         {teams.map((team) => (
           <li key={team.id}>
             {team.name} - {team.score}
+
+            {effect && effect.teamId === team.id &&(
+            <span
+              style={{
+                marginLeft: '10px',
+                color: effect.change > 0 ? '#16a34a' : '#dc2626'
+              }}
+            >
+              {effect.change > 0 ? `+${effect.change}` : effect.change}
+            </span>
+            )}
           </li>
         ))}
       </ul>
@@ -85,6 +130,16 @@ function Control() {
         onChange={(e) => setTeamName(e.target.value)}
       />
       <button onClick={handleAddTeam}>Tambah Tim</button>
+
+      <hr />
+
+      <button onClick={() => window.electronAPI.sendFeedback('correct')}>
+        ✔ BENAR
+      </button>
+
+      <button onClick={() => window.electronAPI.sendFeedback('wrong')}>
+        ✖ SALAH
+      </button>
 
       <hr />
 
