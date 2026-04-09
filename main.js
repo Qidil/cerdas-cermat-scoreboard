@@ -60,6 +60,21 @@ ipcMain.on('add-team', (event, teamName) => {
     )
 })
 
+//hapus tim
+ipcMain.on('delete-team', (event, teamId) => {
+    db.run('DELETE FROM teams WHERE id = ?', [teamId], function (err) {
+        if (err) {
+            console.log(err.message)
+            return
+        }
+
+        db.all('SELECT * FROM teams', [], (err, rows) => {
+            displayWindow.webContents.send('teams-updated', rows)
+            controlWindow.webContents.send('teams-updated', rows)
+        })
+    })
+})
+
 //ambil semua tim saat awal
 ipcMain.handle('get-teams', async () => {
     return new Promise((resolve, reject) => {
@@ -68,4 +83,26 @@ ipcMain.handle('get-teams', async () => {
             else resolve(rows)
         })
     })
+})
+
+//update skor per tim
+ipcMain.on('update-team-score', (event, { teamId, value, type }) => {
+  const operation = type === 'add' ? '+' : '-'
+
+  db.run(
+    `UPDATE teams SET score = score ${operation} ? WHERE id = ?`,
+    [value, teamId],
+    function (err) {
+      if (err) {
+        console.log(err.message)
+        return
+      }
+
+      // kirim update terbaru
+      db.all(`SELECT * FROM teams`, [], (err, rows) => {
+        displayWindow.webContents.send('teams-updated', rows)
+        controlWindow.webContents.send('teams-updated', rows)
+      })
+    }
+  )
 })

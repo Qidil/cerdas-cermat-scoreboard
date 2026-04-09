@@ -7,7 +7,10 @@ contextBridge.exposeInMainWorld('electronAPI', {
 
     //tim
     addTeam: (name) => ipcRenderer.send('add-team', name),
+    deleteTeam: (id) => ipcRenderer.send('delete-team', id),
     getTeams: () => ipcRenderer.invoke('get-teams'),
     onTeamsUpdate: (callback) => 
-        ipcRenderer.on('teams-updated', (event, data) => callback(data))
+        ipcRenderer.on('teams-updated', (event, data) => callback(data)),
+
+    updateTeamScore: (data) => ipcRenderer.send('update-team-score', data)
 })
