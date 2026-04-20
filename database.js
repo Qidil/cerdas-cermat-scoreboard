@@ -16,6 +16,7 @@ db.serialize(() => {
       id INTEGER PRIMARY KEY AUTOINCREMENT,
       action TEXT,
       team_id INTEGER,
+      team_name INTEGER,
       value INTEGER,
       created_at DATETIME DEFAULT CURRENT_TIMESTAMP
     )

@@ -13,6 +13,7 @@ function Display() {
     window.electronAPI.onTeamsUpdate((data) => {
       setTeams(data)
     })
+    
   }, [])
 
   useEffect(() => {
@@ -79,6 +80,7 @@ function Control() {
   const [teams, setTeams] = useState([])
   const [selectedTeam, setSelectedTeam] = useState('')
   const [value, setValue] = useState(0)
+  const [history, setHistory] = useState([])
 
   //ambil data awal
   useEffect(() => {
@@ -88,6 +90,18 @@ function Control() {
     
     window.electronAPI.onTeamsUpdate((data) => {
       setTeams(data)
+    })
+
+    window.electronAPI.getTeams().then((data) => {
+      setTeams(data)
+    })
+
+    // 🔥 history awal
+    window.electronAPI.getHistory().then(setHistory)
+
+    // 🔥 realtime update
+    window.electronAPI.onHistoryUpdate((data) => {
+      setHistory(data)
     })
   }, [])
 
@@ -144,7 +158,7 @@ function Control() {
       <button onClick={() => window.electronAPI.undo()}>
         ↩ UNDO
       </button>
-      
+
       <hr />
 
       {/* PILIH TIM */}
@@ -189,6 +203,53 @@ function Control() {
             </button>
           </li>
         ))}
+      </ul>
+
+      <h3>HISTORY</h3>
+      <ul>
+        {history.map((item) => {
+          if (item.action === 'add') {
+            return (
+              <li key={item.id}>
+                +{item.value} ({item.team_name})
+              </li>
+            )
+          }
+
+          if (item.action === 'minus') {
+            return (
+              <li key={item.id}>
+                -{item.value} ({item.team_name})
+              </li>
+            )
+          }
+
+          if (item.action === 'add-team') {
+            return (
+              <li key={item.id}>
+                Tambah Tim: {item.team_name}
+              </li>
+            )
+          }
+
+          if (item.action === 'delete-team') {
+            return (
+              <li key={item.id}>
+                Hapus Tim: {item.team_name}
+              </li>
+            )
+          }
+
+          if (item.action === 'undo') {
+            return (
+              <li key={item.id}>
+                UNDO ({item.team_name})
+              </li>
+            )
+          }
+
+          return null
+        })}
       </ul>
     </div>
   )
