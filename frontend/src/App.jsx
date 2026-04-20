@@ -141,6 +141,10 @@ function Control() {
         ✖ SALAH
       </button>
 
+      <button onClick={() => window.electronAPI.undo()}>
+        ↩ UNDO
+      </button>
+      
       <hr />
 
       {/* PILIH TIM */}

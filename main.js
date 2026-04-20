@@ -95,6 +95,11 @@ ipcMain.on('update-team-score', (event, { teamId, value, type }) => {
     function (err) {
       if (err) return
     
+      db.run(
+        `INSERT INTO history (action, team_id, value) VALUES (?, ?, ?)`,
+        [type, teamId, value]
+      )
+
       //kirim efek perubahan skor ke display
       const change = type === 'add' ? value : -value
 
@@ -113,4 +118,33 @@ ipcMain.on('update-team-score', (event, { teamId, value, type }) => {
 
 ipcMain.on('answer-feedback', (event, type) => {
     displayWindow.webContents.send('answer-feedback', type)
+})
+
+ipcMain.on('undo', () => {
+  db.get(
+    `SELECT * FROM history ORDER BY id DESC LIMIT 1`,
+    [],
+    (err, last) => {
+      if (!last) return
+
+      const { action, team_id, value, id } = last
+
+      const reverseOp = action === 'add' ? '-' : '+'
+
+      db.run(
+        `UPDATE teams SET score = score ${reverseOp} ? WHERE id = ?`,
+        [value, team_id],
+        () => {
+          // hapus history terakhir
+          db.run(`DELETE FROM history WHERE id = ?`, [id])
+
+          // update UI
+          db.all(`SELECT * FROM teams`, [], (err, rows) => {
+            displayWindow.webContents.send('teams-updated', rows)
+            controlWindow.webContents.send('teams-updated', rows)
+          })
+        }
+      )
+    }
+  )
 })

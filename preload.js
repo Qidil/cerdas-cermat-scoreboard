@@ -16,5 +16,6 @@ contextBridge.exposeInMainWorld('electronAPI', {
         ipcRenderer.on('score-effect', (event, data) => callback(data)),
     sendFeedback: (type) => ipcRenderer.send('answer-feedback', type),
     onFeedback: (callback) => 
-        ipcRenderer.on('answer-feedback', (event, data) => callback(data))
+        ipcRenderer.on('answer-feedback', (event, data) => callback(data)),
+    undo: () => ipcRenderer.send('undo'),
 })
