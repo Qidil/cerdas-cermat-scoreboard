@@ -213,3 +213,83 @@ ipcMain.handle('get-history', async () => {
     )
   })
 })
+
+const fs = require('fs')
+
+ipcMain.on('save-match', () => {
+  db.all(`SELECT * FROM teams`, [], (err, teams) => {
+    if (err) return
+
+    db.all(`SELECT * FROM history`, [], (err, history) => {
+      if (err) return
+
+      const data = {
+        teams,
+        history,
+        savedAt: new Date().toISOString()
+      }
+
+      const fileName = `match-${Date.now()}.json`
+      const filePath = path.join(__dirname, 'backups', fileName)
+
+      fs.writeFileSync(filePath, JSON.stringify(data, null, 2))
+
+      controlWindow.webContents.send('save-success', fileName)
+    })
+  })
+})
+
+ipcMain.handle('get-saved-files', () => {
+  const dir = path.join(__dirname, 'backups')
+
+  if (!fs.existsSync(dir)) return []
+
+  return fs.readdirSync(dir)
+})
+
+ipcMain.on('load-match', (event, fileName) => {
+  const filePath = path.join(__dirname, 'backups', fileName)
+
+  if (!fs.existsSync(filePath)) return
+
+  const data = JSON.parse(fs.readFileSync(filePath))
+
+  db.serialize(() => {
+    db.run(`DELETE FROM teams`)
+    db.run(`DELETE FROM history`)
+
+    // insert teams
+    data.teams.forEach((team) => {
+      db.run(
+        `INSERT INTO teams (id, name, score) VALUES (?, ?, ?)`,
+        [team.id, team.name, team.score]
+      )
+    })
+
+    // insert history
+    data.history.forEach((item) => {
+      db.run(
+        `INSERT INTO history (id, action, team_id, team_name, value, created_at)
+         VALUES (?, ?, ?, ?, ?, ?)`,
+        [
+          item.id,
+          item.action,
+          item.team_id,
+          item.team_name,
+          item.value,
+          item.created_at
+        ]
+      )
+    })
+
+    // 🔥 PINDAHKAN UPDATE UI KE SINI (PALING AKHIR)
+    db.all(`SELECT * FROM teams`, [], (err, rows) => {
+      displayWindow.webContents.send('teams-updated', rows)
+      controlWindow.webContents.send('teams-updated', rows)
+    })
+
+    db.all(`SELECT * FROM history ORDER BY id DESC LIMIT 20`, [], (err, rows) => {
+      controlWindow.webContents.send('history-updated', rows)
+    })
+  })
+})

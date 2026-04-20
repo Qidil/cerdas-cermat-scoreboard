@@ -81,6 +81,7 @@ function Control() {
   const [selectedTeam, setSelectedTeam] = useState('')
   const [value, setValue] = useState(0)
   const [history, setHistory] = useState([])
+  const [files, setFiles] = useState([])
 
   //ambil data awal
   useEffect(() => {
@@ -102,6 +103,13 @@ function Control() {
     // 🔥 realtime update
     window.electronAPI.onHistoryUpdate((data) => {
       setHistory(data)
+    })
+
+    window.electronAPI.getSavedFiles().then(setFiles)
+
+    window.electronAPI.onSaveSuccess((file) => {
+      alert('Tersimpan: ' + file)
+      window.electronAPI.getSavedFiles().then(setFiles)
     })
   }, [])
 
@@ -200,6 +208,24 @@ function Control() {
               style={{ marginLeft: '10px' }}
             >
               ❌
+            </button>
+          </li>
+        ))}
+      </ul>
+
+      <button onClick={() => window.electronAPI.saveMatch()}>
+        💾 Simpan
+      </button>
+
+      <hr />
+
+      <h3>Load Match</h3>
+      <ul>
+        {files.map((file) => (
+          <li key={file}>
+            {file}
+            <button onClick={() => window.electronAPI.loadMatch(file)}>
+              Load
             </button>
           </li>
         ))}

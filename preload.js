@@ -21,4 +21,10 @@ contextBridge.exposeInMainWorld('electronAPI', {
     getHistory: () => ipcRenderer.invoke('get-history'),
     onHistoryUpdate: (callback) =>
         ipcRenderer.on('history-updated', (event, data) => callback(data)),
+    saveMatch: () => ipcRenderer.send('save-match'),
+    onSaveSuccess: (callback) =>
+    ipcRenderer.on('save-success', (e, data) => callback(data)),
+
+    getSavedFiles: () => ipcRenderer.invoke('get-saved-files'),
+    loadMatch: (file) => ipcRenderer.send('load-match', file),
 })
