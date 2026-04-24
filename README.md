@@ -2,6 +2,9 @@
 Aplikasi lomba cerdas cermat (dan sejenisnya) untuk menampilkan skor.
 
 ---
+*Note: masih dalam tahap pengembangan, belum memiliki tampilan dan masih ada beberapa bug
+
+---
 
 ## 🚀 Fitur Utama
 - Menampilkan skor tiap tim (dapat diatur jumlah tim yang berpartisipasi)
