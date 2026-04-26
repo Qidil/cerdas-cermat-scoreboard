@@ -1,4 +1,7 @@
 const { app, BrowserWindow, ipcMain } = require('electron')
+const path = require('path')
+const db = require(path.join(__dirname, 'database.js'))
+const fs = require('fs')
 
 let displayWindow
 let controlWindow
@@ -36,9 +39,6 @@ ipcMain.on('update-score', (event, data) => {
     //kirim ke display
     displayWindow.webContents.send('score-updated', data)
 })
-
-const path = require('path')
-const db = require(path.join(__dirname, 'database.js'))
 
 // tambah tim
 ipcMain.on('add-team', (event, teamName) => {
@@ -151,56 +151,6 @@ ipcMain.on('answer-feedback', (event, type) => {
     displayWindow.webContents.send('answer-feedback', type)
 })
 
-ipcMain.on('undo', () => {
-  db.get(
-    `SELECT * FROM history ORDER BY id DESC LIMIT 1`,
-    [],
-    (err, last) => {
-      if (!last) return
-
-      const { action, team_id, team_name, value, id } = last
-
-      if (action === 'add') {
-        db.run(`UPDATE teams SET score = score - ? WHERE id = ?`, [value, team_id])
-      }
-
-      else if (action === 'minus') {
-        db.run(`UPDATE teams SET score = score + ? WHERE id = ?`, [value, team_id])
-      }
-
-      else if (action === 'add-team') {
-        db.run(`DELETE FROM teams WHERE id = ?`, [team_id])
-      }
-
-      else if (action === 'delete-team') {
-        db.run(
-          `INSERT INTO teams (id, name, score) VALUES (?, ?, 0)`,
-          [team_id, team_name]
-        )
-      }
-
-      // simpan aksi undo
-        db.run(
-        `INSERT INTO history (action, team_id, team_name, value) VALUES (?, ?, ?, ?)`,
-        ['undo', team_id, team_name, value]
-        )
-
-      // hapus history terakhir
-      db.run(`DELETE FROM history WHERE id = ?`, [id])
-
-      db.all(`SELECT * FROM history ORDER BY id DESC LIMIT 20`, [], (err, rows) => {
-        controlWindow.webContents.send('history-updated', rows)
-        })
-
-      // update UI
-      db.all(`SELECT * FROM teams`, [], (err, rows) => {
-        displayWindow.webContents.send('teams-updated', rows)
-        controlWindow.webContents.send('teams-updated', rows)
-      })
-    }
-  )
-})
-
 ipcMain.handle('get-history', async () => {
   return new Promise((resolve, reject) => {
     db.all(
@@ -213,8 +163,6 @@ ipcMain.handle('get-history', async () => {
     )
   })
 })
-
-const fs = require('fs')
 
 ipcMain.on('save-match', () => {
   db.all(`SELECT * FROM teams`, [], (err, teams) => {

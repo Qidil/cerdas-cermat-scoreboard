@@ -163,10 +163,6 @@ function Control() {
         ✖ SALAH
       </button>
 
-      <button onClick={() => window.electronAPI.undo()}>
-        ↩ UNDO
-      </button>
-
       <hr />
 
       {/* PILIH TIM */}
@@ -262,14 +258,6 @@ function Control() {
             return (
               <li key={item.id}>
                 Hapus Tim: {item.team_name}
-              </li>
-            )
-          }
-
-          if (item.action === 'undo') {
-            return (
-              <li key={item.id}>
-                UNDO ({item.team_name})
               </li>
             )
           }

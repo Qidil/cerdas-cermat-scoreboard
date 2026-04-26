@@ -17,7 +17,6 @@ contextBridge.exposeInMainWorld('electronAPI', {
     sendFeedback: (type) => ipcRenderer.send('answer-feedback', type),
     onFeedback: (callback) => 
         ipcRenderer.on('answer-feedback', (event, data) => callback(data)),
-    undo: () => ipcRenderer.send('undo'),
     getHistory: () => ipcRenderer.invoke('get-history'),
     onHistoryUpdate: (callback) =>
         ipcRenderer.on('history-updated', (event, data) => callback(data)),
