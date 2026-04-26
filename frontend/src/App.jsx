@@ -6,6 +6,8 @@ function Display() {
   const [teams, setTeams] = useState([])
   const [effect, setEffect] = useState(null)
   const [feedback, setFeedback] = useState(null)
+  const [timer, setTimer] = useState(0)
+  const [isVisible, setIsVisible] = useState(false)
 
   useEffect(() => {
     window.electronAPI.getTeams().then(setTeams)
@@ -35,6 +37,16 @@ function Display() {
       setTimeout(() => {
         setFeedback(null)
       }, 1000)
+    })
+  }, [])
+
+  useEffect(() => {
+    window.electronAPI.onTimerUpdate((time) => {
+      setTimer(time)
+    })
+
+    window.electronAPI.onTimerVisibility((visible) => {
+      setIsVisible(visible)
     })
   }, [])
 
@@ -70,6 +82,12 @@ function Display() {
           </li>
         ))}
       </ul>
+
+    {isVisible && (
+      <h1 style={{ fontSize: '50px', textAlign: 'center' }}>
+        {timer}
+      </h1>
+    )}
     </div>
   )
 }
@@ -82,6 +100,7 @@ function Control() {
   const [value, setValue] = useState(0)
   const [history, setHistory] = useState([])
   const [files, setFiles] = useState([])
+  const [timeInput, setTimeInput] = useState('')
 
   //ambil data awal
   useEffect(() => {
@@ -161,6 +180,35 @@ function Control() {
 
       <button onClick={() => window.electronAPI.sendFeedback('wrong')}>
         ✖ SALAH
+      </button>
+
+      <hr />
+
+      <h3>TIMER</h3>
+
+      <input
+        type="number"
+        placeholder="Detik (contoh: 10)"
+        value={timeInput}
+        onChange={(e) => setTimeInput(e.target.value)}
+      />
+
+      <br />
+
+      <button onClick={() => window.electronAPI.startTimer(Number(timeInput))}>
+        ▶ Start
+      </button>
+
+      <button onClick={() => window.electronAPI.pauseTimer()}>
+        ⏸ Pause
+      </button>
+
+      <button onClick={() => window.electronAPI.resumeTimer()}>
+        ▶ Resume
+      </button>
+
+      <button onClick={() => window.electronAPI.resetTimer()}>
+        🔄 Reset
       </button>
 
       <hr />

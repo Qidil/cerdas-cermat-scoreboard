@@ -241,3 +241,64 @@ ipcMain.on('load-match', (event, fileName) => {
     })
   })
 })
+
+let timerInterval = null
+let currentTime = 0
+let isRunning = false
+
+// ▶ START (mulai baru)
+ipcMain.on('start-timer', (event, time) => {
+  clearInterval(timerInterval)
+
+  currentTime = time
+  isRunning = true
+
+  // 🔥 kirim nilai awal dulu
+  displayWindow.webContents.send('timer-visibility', true)
+  displayWindow.webContents.send('timer-update', currentTime)
+
+  timerInterval = setInterval(() => {
+    currentTime--
+
+    displayWindow.webContents.send('timer-update', currentTime)
+
+    if (currentTime <= 0) {
+      clearInterval(timerInterval)
+      isRunning = false
+    }
+  }, 1000)
+})
+
+// ⏸ PAUSE
+ipcMain.on('pause-timer', () => {
+  clearInterval(timerInterval)
+  isRunning = false
+})
+
+// ▶ RESUME (lanjutkan)
+ipcMain.on('resume-timer', () => {
+  if (isRunning || currentTime <= 0) return
+
+  isRunning = true
+
+  timerInterval = setInterval(() => {
+    currentTime--
+
+    displayWindow.webContents.send('timer-update', currentTime)
+
+    if (currentTime <= 0) {
+      clearInterval(timerInterval)
+      isRunning = false
+    }
+  }, 1000)
+})
+
+// 🔄 RESET
+ipcMain.on('reset-timer', () => {
+  clearInterval(timerInterval)
+  currentTime = 0
+  isRunning = false
+
+  displayWindow.webContents.send('timer-update', currentTime)
+  displayWindow.webContents.send('timer-visibility', false)
+})

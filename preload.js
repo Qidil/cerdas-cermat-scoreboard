@@ -23,7 +23,14 @@ contextBridge.exposeInMainWorld('electronAPI', {
     saveMatch: () => ipcRenderer.send('save-match'),
     onSaveSuccess: (callback) =>
     ipcRenderer.on('save-success', (e, data) => callback(data)),
-
     getSavedFiles: () => ipcRenderer.invoke('get-saved-files'),
     loadMatch: (file) => ipcRenderer.send('load-match', file),
+    startTimer: (time) => ipcRenderer.send('start-timer', time),
+    pauseTimer: () => ipcRenderer.send('pause-timer'),
+    resetTimer: () => ipcRenderer.send('reset-timer'),
+    onTimerUpdate: (callback) =>
+        ipcRenderer.on('timer-update', (e, data) => callback(data)),
+    onTimerVisibility: (callback) =>
+    ipcRenderer.on('timer-visibility', (e, data) => callback(data)),
+    resumeTimer: () => ipcRenderer.send('resume-timer'),
 })
