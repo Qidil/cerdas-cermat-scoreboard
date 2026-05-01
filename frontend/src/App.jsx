@@ -1,5 +1,8 @@
 import { Routes, Route, Navigate } from 'react-router-dom'
 import { useState, useEffect } from 'react'
+import correctSoundFile from './assets/sounds/correct.mp3'
+import wrongSoundFile from './assets/sounds/wrong.mp3'
+import tickSoundFile from './assets/sounds/tick.mp3'
 
 const electronAPI = window.electronAPI
 
@@ -10,6 +13,9 @@ function Display() {
   const [feedback, setFeedback] = useState(null)
   const [timer, setTimer] = useState(0)
   const [isVisible, setIsVisible] = useState(false)
+  const correctSound = new Audio(correctSoundFile)
+  const wrongSound = new Audio(wrongSoundFile)
+  const tickSound = new Audio(tickSoundFile)
 
   useEffect(() => {
     if (!electronAPI) return
@@ -39,6 +45,14 @@ function Display() {
     electronAPI.onFeedback((type) => {
       setFeedback(type)
 
+      if (type === 'correct') {
+        correctSound.currentTime = 0
+        correctSound.play()
+      } else {
+        wrongSound.currentTime = 0
+        wrongSound.play()
+      }
+
       setTimeout(() => {
         setFeedback(null)
       }, 1000)
@@ -50,6 +64,12 @@ function Display() {
 
     electronAPI.onTimerUpdate((time) => {
       setTimer(time)
+
+      // 🔊 tick
+      if (time > 0) {
+        tickSound.currentTime = 0
+        tickSound.play()
+      }
     })
 
     electronAPI.onTimerVisibility((visible) => {
@@ -57,83 +77,81 @@ function Display() {
     })
   }, [])
 
-return (
-  <div className="h-screen w-screen bg-slate-900 text-white flex flex-col relative">
 
-    {/* 🧩 HEADER */}
-    <div className="h-[12%] flex items-center justify-center">
-      <h1 className="text-4xl font-bold tracking-widest">
-        LOMBA CERDAS CERMAT
-      </h1>
-    </div>
 
-    {/* 🧩 BODY */}
-    <div className="h-[78%] flex flex-col items-center justify-center relative">
+  return (
+    <div className="h-screen w-screen bg-slate-900 text-white flex flex-col relative">
 
-      {/* 🔥 WATERMARK LOGO */}
-      <div className="absolute opacity-10 text-[200px] font-bold">
-        LOGO
+      {/* HEADER */}
+      <div className="h-[12%] flex items-center justify-center">
+        <h1 className="text-4xl font-bold tracking-widest">
+          LOMBA CERDAS CERMAT
+        </h1>
       </div>
 
-      {/* 🧠 SCOREBOARD */}
-      <div className="flex gap-20">
-        {teams.map((team) => (
-          <div key={team.id} className="text-center relative">
-            <h2 className="text-2xl mb-2">{team.name}</h2>
+      {/* BODY */}
+      <div className="h-[78%] flex flex-col items-center justify-center relative">
 
-            <div className="text-6xl font-bold">
-              {team.score}
-            </div>
+        <div className="absolute opacity-10 text-[200px] font-bold">
+          LOGO
+        </div>
 
-            {/* efek +100 / -100 */}
-            {effect && effect.teamId === team.id && (
-              <div
-                className={`absolute left-1/2 -translate-x-1/2 text-5xl animate-score-pop ${
-                  effect.change > 0 ? 'text-green-400' : 'text-red-400'
-                }`}
-                style={{ top: 0 }}
-              >
-                {effect.change > 0 ? `+${effect.change}` : effect.change}
+        <div className="flex gap-20">
+          {teams.map((team) => (
+            <div key={team.id} className="text-center relative">
+              <h2 className="text-2xl mb-2">{team.name}</h2>
+
+              <div className="text-6xl font-bold">
+                {team.score}
               </div>
-            )}
+
+              {effect && effect.teamId === team.id && (
+                <div
+                  className={`absolute left-1/2 -translate-x-1/2 text-5xl animate-score-pop ${
+                    effect.change > 0 ? 'text-green-400' : 'text-red-400'
+                  }`}
+                  style={{ top: 0 }}
+                >
+                  {effect.change > 0 ? `+${effect.change}` : effect.change}
+                </div>
+              )}
+            </div>
+          ))}
+        </div>
+
+        {isVisible && (
+          <div className="absolute bottom-10 text-5xl font-bold animate-timer-pulse">
+            {timer}
           </div>
-        ))}
+        )}
       </div>
 
-      {/* ⏱ TIMER */}
-      {isVisible && (
-        <div className="absolute bottom-10 text-5xl font-bold animate-timer-pulse">
-          {timer}
+      {/* FOOTER */}
+      <div className="h-[10%] flex items-end justify-end pr-6 pb-4 text-sm opacity-80">
+        <div>
+          SUPPORTED BY [logo] [logo] | SPONSORED BY [logo] [logo]
+        </div>
+      </div>
+
+      {/* FEEDBACK */}
+      {feedback && (
+        <div
+          className={`absolute inset-0 flex items-center justify-center text-9xl font-bold ${
+            feedback === 'correct' ? 'animate-flicker' : ''
+          }`}
+          style={{
+            backgroundColor:
+              feedback === 'correct'
+                ? 'rgba(0,255,0,0.8)'
+                : 'rgba(255,0,0,0.8)'
+          }}
+        >
+          {feedback === 'correct' ? '✔' : '✖'}
         </div>
       )}
+
     </div>
-
-    {/* 🧩 FOOTER */}
-    <div className="h-[10%] flex items-end justify-end pr-6 pb-4 text-sm opacity-80">
-      <div>
-        SUPPORTED BY [logo] [logo] | SPONSORED BY [logo] [logo]
-      </div>
-    </div>
-
-    {/* 🎬 FEEDBACK OVERLAY */}
-    {feedback && (
-      <div
-        className={`absolute inset-0 flex items-center justify-center text-9xl font-bold ${
-          feedback === 'correct' ? 'animate-flicker' : ''
-        }`}
-        style={{
-          backgroundColor:
-            feedback === 'correct'
-              ? 'rgba(0,255,0,0.8)'
-              : 'rgba(255,0,0,0.8)'
-        }}
-      >
-        {feedback === 'correct' ? '✔' : '✖'}
-      </div>
-    )}
-
-  </div>
-)
+  )
 }
 
 // 🎮 CONTROL
