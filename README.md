@@ -2,7 +2,7 @@
 
 Aplikasi desktop untuk menampilkan skor lomba cerdas cermat secara real-time dengan dual-window: **Display** (layar penonton) dan **Control Panel** (layar operator).
 
-> ⚠️ **Status:** Tahap pengembangan aktif. Fitur kustomisasi tampilan sudah fungsional. Untuk mencoba versi distribusi `.exe`, lihat branch **[`exe-v1`](https://github.com/Qidil/cerdas-cermat-scoreboard/tree/exe-v1)**.
+> ⚠️ **Status:** Tahap pengembangan aktif. Fitur kustomisasi tampilan sudah fungsional. Untuk panduan build `.exe`, lihat branch **[`exe-v1`](https://github.com/Qidil/cerdas-cermat-scoreboard/tree/exe-v1)**.
 
 ---
 
@@ -56,9 +56,9 @@ Aplikasi akan membuka dua window: Display (`/display`) dan Control (`/control`).
 └── score.db          # Database runtime (gitignored)
 ```
 
-## 📥 Download
+## 📥 Download & Build `.exe`
 
-Unduh versi portable `.exe` dari branch **[`exe-v1`](https://github.com/Qidil/cerdas-cermat-scoreboard/tree/exe-v1)**. Ekstrak ZIP lalu jalankan `Cerdas Cermat Scoreboard.exe`.
+Panduan lengkap build `.exe` ada di branch **[`exe-v1`](https://github.com/Qidil/cerdas-cermat-scoreboard/tree/exe-v1#-panduan-membuat-exe-distribusi)**.
 
 ## 🔮 Rencana
 
