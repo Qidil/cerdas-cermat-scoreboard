@@ -58,7 +58,9 @@ Aplikasi akan membuka dua window: Display (`/display`) dan Control (`/control`).
 
 ## 📥 Download & Build `.exe`
 
-Panduan lengkap build `.exe` ada di branch **[`exe-v1`](https://github.com/Qidil/cerdas-cermat-scoreboard/tree/exe-v1#-panduan-membuat-exe-distribusi)**.
+**Download langsung (Google Drive):** [Klik di sini](https://drive.google.com/drive/folders/1GyO5aDpVRsyr9xK_pBO4mlJ1T9vkCoLR?usp=sharing)
+
+**Build sendiri:** Panduan lengkap ada di branch **[`exe-v1`](https://github.com/Qidil/cerdas-cermat-scoreboard/tree/exe-v1#-panduan-membuat-exe-distribusi)**.
 
 ## 🔮 Rencana
 
