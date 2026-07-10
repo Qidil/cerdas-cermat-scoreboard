@@ -33,4 +33,12 @@ contextBridge.exposeInMainWorld('electronAPI', {
     onTimerVisibility: (callback) =>
     ipcRenderer.on('timer-visibility', (e, data) => callback(data)),
     resumeTimer: () => ipcRenderer.send('resume-timer'),
+
+    //settings
+    getSetting: (key) => ipcRenderer.invoke('get-setting', key),
+    getAllSettings: () => ipcRenderer.invoke('get-all-settings'),
+    setSetting: (key, value) => ipcRenderer.send('set-setting', { key, value }),
+    deleteSetting: (key) => ipcRenderer.send('delete-setting', key),
+    onSettingsUpdate: (callback) =>
+        ipcRenderer.on('settings-updated', (e, data) => callback(data)),
 })

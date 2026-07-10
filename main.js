@@ -242,6 +242,54 @@ ipcMain.on('load-match', (event, fileName) => {
   })
 })
 
+// settings
+ipcMain.handle('get-setting', async (event, key) => {
+  return new Promise((resolve, reject) => {
+    db.get(`SELECT value FROM settings WHERE key = ?`, [key], (err, row) => {
+      if (err) reject(err)
+      else resolve(row ? row.value : null)
+    })
+  })
+})
+
+ipcMain.handle('get-all-settings', async () => {
+  return new Promise((resolve, reject) => {
+    db.all(`SELECT * FROM settings`, [], (err, rows) => {
+      if (err) reject(err)
+      else {
+        const settings = {}
+        rows.forEach((row) => { settings[row.key] = row.value })
+        resolve(settings)
+      }
+    })
+  })
+})
+
+ipcMain.on('set-setting', (event, { key, value }) => {
+  db.run(
+    `INSERT INTO settings (key, value) VALUES (?, ?)
+     ON CONFLICT(key) DO UPDATE SET value = excluded.value`,
+    [key, value],
+    function (err) {
+      if (err) {
+        console.log('Error saving setting:', err.message)
+        return
+      }
+      displayWindow.webContents.send('settings-updated', { key, value })
+    }
+  )
+})
+
+ipcMain.on('delete-setting', (event, key) => {
+  db.run(`DELETE FROM settings WHERE key = ?`, [key], function (err) {
+    if (err) {
+      console.log('Error deleting setting:', err.message)
+      return
+    }
+    displayWindow.webContents.send('settings-updated', { key, value: null })
+  })
+})
+
 let timerInterval = null
 let currentTime = 0
 let isRunning = false
