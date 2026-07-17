@@ -24,6 +24,14 @@ Aplikasi desktop untuk menampilkan skor lomba cerdas cermat secara real-time den
 | Database | SQLite 3 (via `sqlite3` native addon) |
 | Komunikasi | IPC (contextBridge) |
 
+![React](https://img.shields.io/badge/React-19-61DAFB?logo=react&logoColor=white)
+![Vite](https://img.shields.io/badge/Vite-8-646CFF?logo=vite&logoColor=white)
+![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS_v3-06B6D4?logo=tailwindcss&logoColor=white)
+![React Router](https://img.shields.io/badge/React_Router-7-CA4245?logo=reactrouter&logoColor=white)
+![Electron](https://img.shields.io/badge/Electron-41-47848F?logo=electron&logoColor=white)
+![SQLite](https://img.shields.io/badge/SQLite_3-003B57?logo=sqlite&logoColor=white)
+![JavaScript](https://img.shields.io/badge/JavaScript-ES6-F7DF1E?logo=javascript&logoColor=black)
+ 
 ## 📦 Instalasi
 
 ```bash
