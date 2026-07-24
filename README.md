@@ -4,6 +4,11 @@ Aplikasi desktop untuk menampilkan skor lomba cerdas cermat secara real-time den
 
 > ⚠️ **Status:** Tahap pengembangan aktif. Fitur kustomisasi tampilan sudah fungsional. Untuk membuat `.exe` distribusi sendiri, ikuti panduan di branch **[`exe-v1`](https://github.com/Qidil/cerdas-cermat-scoreboard/tree/exe-v1)**.
 
+![React](https://img.shields.io/badge/React-19-61DAFB?logo=react&logoColor=white)
+![Vite](https://img.shields.io/badge/Vite-8-646CFF?logo=vite&logoColor=white)
+![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-3-06B6D4?logo=tailwindcss&logoColor=white)
+![JavaScript](https://img.shields.io/badge/JavaScript-ES6-F7DF1E?logo=javascript&logoColor=black)
+
 Scoreboard lomba cerdas cermat masih sering menggunakan metode manual (papan tulis, spidol, kertas) yang rawan kesalahan input, tidak real-time, dan menyulitkan panitia saat harus mengumumkan skor secara cepat. Aplikasi digital yang ada di pasaran umumnya berbasis web, membutuhkan koneksi internet, tidak bisa dikustomisasi untuk kebutuhan lomba tertentu, dan tampilannya terlalu umum.
 
 Aplikasi ini ditujukan untuk panitia lomba cerdas cermat di sekolah, kampus, pesantren, atau instansi yang membutuhkan scoreboard digital profesional — real-time, mudah dioperasikan, dan bisa dikustomisasi tampilannya sesuai tema acara.
