@@ -6,3 +6,6 @@ frontend/node_modules
 frontend/dist
 backups/
 skills-lock.json
+.agents/
+.opencode/
+project-context/
