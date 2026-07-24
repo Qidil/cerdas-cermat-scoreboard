@@ -2,11 +2,17 @@
 
 Aplikasi desktop untuk menampilkan skor lomba cerdas cermat secara real-time dengan dual-window: **Display** (layar penonton) dan **Control Panel** (layar operator).
 
-> ⚠️ **Status:** Tahap pengembangan aktif. Fitur kustomisasi tampilan sudah fungsional. Untuk panduan build `.exe`, lihat branch **[`exe-v1`](https://github.com/Qidil/cerdas-cermat-scoreboard/tree/exe-v1)**.
+> ⚠️ **Status:** Tahap pengembangan aktif. Fitur kustomisasi tampilan sudah fungsional. Untuk membuat `.exe` distribusi sendiri, ikuti panduan di branch **[`exe-v1`](https://github.com/Qidil/cerdas-cermat-scoreboard/tree/exe-v1)**.
+
+Scoreboard lomba cerdas cermat masih sering menggunakan metode manual (papan tulis, spidol, kertas) yang rawan kesalahan input, tidak real-time, dan menyulitkan panitia saat harus mengumumkan skor secara cepat. Aplikasi digital yang ada di pasaran umumnya berbasis web, membutuhkan koneksi internet, tidak bisa dikustomisasi untuk kebutuhan lomba tertentu, dan tampilannya terlalu umum.
+
+Aplikasi ini ditujukan untuk panitia lomba cerdas cermat di sekolah, kampus, pesantren, atau instansi yang membutuhkan scoreboard digital profesional — real-time, mudah dioperasikan, dan bisa dikustomisasi tampilannya sesuai tema acara.
+
+Cerdas Cermat Scoreboard menjawab semua masalah itu dengan menghadirkan aplikasi desktop dual-window yang bekerja sepenuhnya secara lokal tanpa perlu internet. Window Display menampilkan skor di layar penonton dengan animasi real-time, sementara Control Panel digunakan operator untuk mengatur skor, timer, dan kustomisasi tampilan. Aplikasi ini mendukung manajemen tim, timer countdown dengan suara, feedback visual & audio, backup data, serta kustomisasi penuh (header, warna, gambar background, logo, font sponsor) — semua tersimpan di database lokal.
 
 ---
 
-## 🚀 Fitur
+## Key Features
 
 - Manajemen tim (tambah/hapus tim)
 - Skor real-time dengan animasi perubahan (+/-)
@@ -15,60 +21,53 @@ Aplikasi desktop untuk menampilkan skor lomba cerdas cermat secara real-time den
 - Backup & restore data match
 - **Kustomisasi tampilan** (header, warna, gambar background, logo, font, sponsor)
 
-## 🛠️ Tech Stack
+---
 
-| Layer | Teknologi |
-|---|---|
-| Frontend | React 19, Vite 8, React Router, Tailwind CSS 3 |
-| Desktop | Electron 41 |
-| Database | SQLite 3 (via `sqlite3` native addon) |
-| Komunikasi | IPC (contextBridge) |
+## Challenge
 
-![React](https://img.shields.io/badge/React-19-61DAFB?logo=react&logoColor=white)
-![Vite](https://img.shields.io/badge/Vite-8-646CFF?logo=vite&logoColor=white)
-![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS_v3-06B6D4?logo=tailwindcss&logoColor=white)
-![React Router](https://img.shields.io/badge/React_Router-7-CA4245?logo=reactrouter&logoColor=white)
-![Electron](https://img.shields.io/badge/Electron-41-47848F?logo=electron&logoColor=white)
-![SQLite](https://img.shields.io/badge/SQLite_3-003B57?logo=sqlite&logoColor=white)
-![JavaScript](https://img.shields.io/badge/JavaScript-ES6-F7DF1E?logo=javascript&logoColor=black)
- 
-## 📦 Instalasi
+Tantangan terbesar dalam pembuatan aplikasi ini:
 
-```bash
-npm install
-cd frontend && npm install
-```
+1. **Dual-window architecture** — display dan control panel berjalan di dua window terpisah yang harus tetap sinkron real-time melalui IPC tanpa delay
+2. **Native SQLite di Electron** — native module `sqlite3` harus di-rebuild ulang untuk setiap versi Electron
+3. **Kustomisasi tampilan real-time** — gambar/font diupload sebagai base64 dan langsung dirender tanpa restart
+4. **Distribusi .exe portable** — satu folder portable yang bisa jalan langsung dari flashdisk tanpa instalasi
+5. **Distribusi file** — file .exe 212 MB melebihi batas 100 MB GitHub, distribusi via Google Drive
 
-## ▶️ Menjalankan
+---
 
-```bash
-npm start
-```
+## Tech Choices
 
-Aplikasi akan membuka dua window: Display (`/display`) dan Control (`/control`).
+- **Electron** — platform desktop cross-platform dengan akses penuh ke file system, cocok untuk aplikasi lokal yang menyimpan data di disk
+- **React** — library UI deklaratif untuk antarmuka reaktif real-time antara display dan control panel
+- **Vite** — build tool cepat dengan Hot Module Replacement (HMR) yang mempercepat development
+- **Tailwind CSS** — utility-first CSS framework untuk styling cepat dan konsisten tanpa meninggalkan JSX
+- **SQLite (sqlite3)** — database embedded tanpa setup server, data dalam satu file lokal, tanpa perlu internet
+- **React Router** — routing untuk memisahkan halaman Display dan Control dalam satu aplikasi React
+- **IPC (contextBridge)** — pola komunikasi aman antara main process dan renderer process di Electron
 
-**Catatan:** Pastikan `Vite dev server` sudah siap sebelum Electron terhubung. Jika `ERR_CONNECTION_REFUSED`, jalankan ulang.
+---
 
-## 🗂️ Struktur Proyek
+## Screenshot
 
-```
-├── frontend/          # React app (Vite)
-│   ├── src/
-│   │   ├── App.jsx   # Display + Control components
-│   │   └── assets/   # Suara (correct, wrong, tick)
-│   └── dist/         # Build output
-├── main.js           # Electron main process
-├── preload.js        # IPC bridge
-├── database.js       # SQLite inisialisasi
-├── project-context/  # Dokumen spesifikasi
-└── score.db          # Database runtime (gitignored)
-```
-
-## 📥 Download & Build `.exe`
-
-**Download langsung (Google Drive):** [Klik di sini](https://drive.google.com/drive/folders/1GyO5aDpVRsyr9xK_pBO4mlJ1T9vkCoLR?usp=sharing)
-
-**Build sendiri:** Panduan lengkap ada di branch **[`exe-v1`](https://github.com/Qidil/cerdas-cermat-scoreboard/tree/exe-v1#-panduan-membuat-exe-distribusi)**.
+<table>
+  <tr>
+    <td align="center">
+      <img src="screenshot/control panel_pengaturan skor.png" alt="Control Panel Pengaturan Skor" height="300">
+      <br>
+      <em>Control Panel Pengaturan Skor</em>
+    </td>
+    <td align="center">
+      <img src="screenshot/control panel_pengaturan tampilan_1.png" alt="Control Panel Pengaturan Tampilan 1" height="300">
+      <br>
+      <em>Control Panel Pengaturan Tampilan 1</em>
+    </td>
+    <td align="center">
+      <img src="screenshot/control panel_pengaturan tampilan_2.png" alt="Control Panel Pengaturan Tampilan 2" height="300">
+      <br>
+      <em>Control Panel Pengaturan Tampilan 2</em>
+    </td>
+  </tr>
+</table>
 
 ## 🔮 Rencana
 
