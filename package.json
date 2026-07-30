@@ -5,11 +5,15 @@
   "scripts": {
     "dev": "cd frontend && npm run dev",
     "electron": "electron .",
-    "start": "concurrently \"npm run dev\" \"npm run electron\""
+    "start": "concurrently \"npm run dev\" \"npm run electron\"",
+    "build:vite": "cd frontend && npm run build",
+    "build:exe": "electron-packager . \"Cerdas Cermat Scoreboard\" --platform=win32 --arch=x64 --out=release --overwrite --icon=frontend/public/favicon --prune=true --ignore=\"frontend/node_modules\" --ignore=\"frontend/src\" --ignore=\"node_modules\" --ignore=\"backups\" --ignore=\"project-context\" --ignore=\".opencode\" --ignore=\".agents\""
   },
   "devDependencies": {
     "concurrently": "^9.2.1",
-    "electron": "^41.1.1"
+    "electron": "^41.1.1",
+    "@electron/rebuild": "^3.6.2",
+    "electron-packager": "^17.1.2"
   },
   "dependencies": {
     "sqlite3": "^6.0.1"

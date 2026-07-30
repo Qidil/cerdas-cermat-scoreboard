@@ -41,4 +41,6 @@ contextBridge.exposeInMainWorld('electronAPI', {
     deleteSetting: (key) => ipcRenderer.send('delete-setting', key),
     onSettingsUpdate: (callback) =>
         ipcRenderer.on('settings-updated', (e, data) => callback(data)),
+    onOperationError: (callback) =>
+        ipcRenderer.on('operation-error', (e, data) => callback(data)),
 })
