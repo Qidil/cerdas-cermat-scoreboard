@@ -18,9 +18,12 @@ function getDataDir() {
 }
 
 function createWindow() {
+  const iconPath = path.join(__dirname, 'frontend', 'public', 'favicon.ico')
+
   displayWindow = new BrowserWindow({
     width: 1000,
     height: 700,
+    icon: iconPath,
     webPreferences: {
       preload: path.join(__dirname, 'preload.js')
     }
@@ -29,6 +32,7 @@ function createWindow() {
   controlWindow = new BrowserWindow({
     width: 800,
     height: 600,
+    icon: iconPath,
     webPreferences: {
       preload: path.join(__dirname, 'preload.js')
     }

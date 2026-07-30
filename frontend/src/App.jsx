@@ -1,5 +1,5 @@
 import { Routes, Route, Navigate } from 'react-router-dom'
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import correctSoundFile from './assets/sounds/correct.mp3'
 import wrongSoundFile from './assets/sounds/wrong.mp3'
 import tickSoundFile from './assets/sounds/tick.mp3'
@@ -12,9 +12,12 @@ function Display() {
   const [feedback, setFeedback] = useState(null)
   const [timer, setTimer] = useState(0)
   const [isVisible, setIsVisible] = useState(false)
-  const correctSound = new Audio(correctSoundFile)
-  const wrongSound = new Audio(wrongSoundFile)
-  const tickSound = new Audio(tickSoundFile)
+  const correctSound = useRef(null)
+  const wrongSound = useRef(null)
+  const tickSound = useRef(null)
+  if (!correctSound.current) correctSound.current = new Audio(correctSoundFile)
+  if (!wrongSound.current) wrongSound.current = new Audio(wrongSoundFile)
+  if (!tickSound.current) tickSound.current = new Audio(tickSoundFile)
   const [headerText, setHeaderText] = useState('')
   const [bgColor, setBgColor] = useState('#0f172a')
   const [bgImage, setBgImage] = useState('')
@@ -48,6 +51,11 @@ function Display() {
   const [posFooterY, setPosFooterY] = useState(0)
   const [teamGap, setTeamGap] = useState(80)
   const [hideSponsor, setHideSponsor] = useState(false)
+  const [fontWeightHeader, setFontWeightHeader] = useState('bold')
+  const [fontWeightTeam, setFontWeightTeam] = useState('bold')
+  const [fontWeightScore, setFontWeightScore] = useState('bold')
+  const [fontWeightTimer, setFontWeightTimer] = useState('bold')
+  const [fontWeightFooter, setFontWeightFooter] = useState('normal')
 
   useEffect(() => {
     if (!electronAPI) return
@@ -92,6 +100,11 @@ function Display() {
       if (settings.pos_footer_y) setPosFooterY(parseInt(settings.pos_footer_y))
       if (settings.team_gap) setTeamGap(parseInt(settings.team_gap))
       if (settings.hide_sponsor) setHideSponsor(settings.hide_sponsor === 'true')
+      if (settings.font_weight_header) setFontWeightHeader(settings.font_weight_header)
+      if (settings.font_weight_team) setFontWeightTeam(settings.font_weight_team)
+      if (settings.font_weight_score) setFontWeightScore(settings.font_weight_score)
+      if (settings.font_weight_timer) setFontWeightTimer(settings.font_weight_timer)
+      if (settings.font_weight_footer) setFontWeightFooter(settings.font_weight_footer)
     })
 
     electronAPI.onSettingsUpdate((data) => {
@@ -129,6 +142,11 @@ function Display() {
         case 'pos_footer_y': setPosFooterY(parseInt(data.value)); break
         case 'team_gap': setTeamGap(parseInt(data.value)); break
         case 'hide_sponsor': setHideSponsor(data.value === 'true'); break
+        case 'font_weight_header': setFontWeightHeader(data.value); break
+        case 'font_weight_team': setFontWeightTeam(data.value); break
+        case 'font_weight_score': setFontWeightScore(data.value); break
+        case 'font_weight_timer': setFontWeightTimer(data.value); break
+        case 'font_weight_footer': setFontWeightFooter(data.value); break
       }
     })
   }, [])
@@ -152,11 +170,11 @@ function Display() {
       setFeedback(type)
 
       if (type === 'correct') {
-        correctSound.currentTime = 0
-        correctSound.play()
+        correctSound.current.currentTime = 0
+        correctSound.current.play()
       } else {
-        wrongSound.currentTime = 0
-        wrongSound.play()
+        wrongSound.current.currentTime = 0
+        wrongSound.current.play()
       }
 
       setTimeout(() => {
@@ -172,8 +190,8 @@ function Display() {
       setTimer(time)
 
       if (time > 0) {
-        tickSound.currentTime = 0
-        tickSound.play()
+        tickSound.current.currentTime = 0
+        tickSound.current.play()
       }
     })
 
@@ -211,7 +229,7 @@ function Display() {
       }}
     >
       <div className="h-[12%] flex items-center justify-center" style={{ transform: `translate(${posHeaderX}px, ${posHeaderY}px)` }}>
-        <h1 className="font-bold tracking-widest" style={{ color: textColorHeader, fontFamily: fontHeader ? 'CerdasHeader' : undefined, fontSize: `${fontSizeHeader}px` }}>
+        <h1 className="tracking-widest" style={{ color: textColorHeader, fontFamily: fontHeader ? 'CerdasHeader' : undefined, fontSize: `${fontSizeHeader}px`, fontWeight: fontWeightHeader }}>
           {headerText}
         </h1>
       </div>
@@ -229,9 +247,9 @@ function Display() {
         <div className="flex" style={{ gap: `${teamGap}px` }}>
           {teams.map((team) => (
             <div key={team.id} className="text-center relative" style={{ transform: `translate(${posTeamX}px, ${posTeamY}px)` }}>
-              <h2 style={{ color: textColorTeam, fontFamily: fontTeam ? 'CerdasTeam' : undefined, fontSize: `${fontSizeTeam}px` }}>{team.name}</h2>
+              <h2 style={{ color: textColorTeam, fontFamily: fontTeam ? 'CerdasTeam' : undefined, fontSize: `${fontSizeTeam}px`, fontWeight: fontWeightTeam }}>{team.name}</h2>
 
-              <div className="font-bold" style={{ color: textColorScore, fontFamily: fontScore ? 'CerdasScore' : undefined, fontSize: `${fontSizeScore}px`, transform: `translate(${posScoreX}px, ${posScoreY}px)` }}>
+              <div style={{ color: textColorScore, fontFamily: fontScore ? 'CerdasScore' : undefined, fontSize: `${fontSizeScore}px`, fontWeight: fontWeightScore, transform: `translate(${posScoreX}px, ${posScoreY}px)` }}>
                 {team.score}
               </div>
 
@@ -250,14 +268,14 @@ function Display() {
         </div>
 
         {isVisible && (
-          <div className="absolute bottom-10 font-bold animate-timer-pulse" style={{ color: textColorTimer, fontFamily: fontTimer ? 'CerdasTimer' : undefined, fontSize: `${fontSizeTimer}px`, transform: `translate(${posTimerX}px, ${posTimerY}px)` }}>
+          <div className="absolute bottom-10 animate-timer-pulse" style={{ color: textColorTimer, fontFamily: fontTimer ? 'CerdasTimer' : undefined, fontSize: `${fontSizeTimer}px`, fontWeight: fontWeightTimer, transform: `translate(${posTimerX}px, ${posTimerY}px)` }}>
             {timer}
           </div>
         )}
       </div>
 
       {!hideSponsor && (
-        <div className="h-[10%] flex items-end justify-end pr-6 pb-4" style={{ color: textColorFooter, fontFamily: fontFooter ? 'CerdasFooter' : undefined, fontSize: `${fontSizeFooter}px`, transform: `translate(${posFooterX}px, ${posFooterY}px)` }}>
+        <div className="h-[10%] flex items-end justify-end pr-6 pb-4" style={{ color: textColorFooter, fontFamily: fontFooter ? 'CerdasFooter' : undefined, fontSize: `${fontSizeFooter}px`, fontWeight: fontWeightFooter, transform: `translate(${posFooterX}px, ${posFooterY}px)` }}>
           <div className="flex items-center gap-2 flex-wrap justify-end">
             {sponsorLogos.filter((s) => s.category === 'supported').length > 0 && (
               <>
@@ -292,7 +310,7 @@ function Display() {
                 : 'rgba(255,0,0,0.8)'
           }}
         >
-          <svg viewBox="0 0 24 24" className="w-32 h-32" fill="none" stroke="white" strokeWidth="4" strokeLinecap="round" strokeLinejoin="round">
+          <svg viewBox="0 0 24 24" className="w-[70vh] h-[70vh]" fill="none" stroke="white" strokeWidth="4" strokeLinecap="round" strokeLinejoin="round">
             {feedback === 'correct' ? (
               <path d="M5 13l4 4L19 7" />
             ) : (
@@ -356,6 +374,11 @@ function Control() {
   const [posFooterY, setPosFooterY] = useState(0)
   const [teamGap, setTeamGap] = useState(80)
   const [hideSponsor, setHideSponsor] = useState(false)
+  const [fontWeightHeader, setFontWeightHeader] = useState('bold')
+  const [fontWeightTeam, setFontWeightTeam] = useState('bold')
+  const [fontWeightScore, setFontWeightScore] = useState('bold')
+  const [fontWeightTimer, setFontWeightTimer] = useState('bold')
+  const [fontWeightFooter, setFontWeightFooter] = useState('normal')
   const [notification, setNotification] = useState('')
   const [confirmDelete, setConfirmDelete] = useState(null)
   const [isLoading, setIsLoading] = useState(true)
@@ -424,6 +447,11 @@ function Control() {
       if (settings.pos_footer_y) setPosFooterY(parseInt(settings.pos_footer_y))
       if (settings.team_gap) setTeamGap(parseInt(settings.team_gap))
       if (settings.hide_sponsor) setHideSponsor(settings.hide_sponsor === 'true')
+      if (settings.font_weight_header) setFontWeightHeader(settings.font_weight_header)
+      if (settings.font_weight_team) setFontWeightTeam(settings.font_weight_team)
+      if (settings.font_weight_score) setFontWeightScore(settings.font_weight_score)
+      if (settings.font_weight_timer) setFontWeightTimer(settings.font_weight_timer)
+      if (settings.font_weight_footer) setFontWeightFooter(settings.font_weight_footer)
 
       setIsLoading(false)
     })
@@ -640,29 +668,17 @@ function Control() {
               />
             </div>
 
-            {/* WARNA & GAMBAR */}
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <label className="block font-semibold text-sm">Warna Background</label>
-                <input
-                  type="color"
-                  value={bgColor}
-                  onChange={(e) => {
-                    setBgColor(e.target.value)
-                    electronAPI?.setSetting('bg_color', e.target.value)
-                  }}
-                  className="border p-1 w-full h-9"
-                />
-              </div>
-              <div>
-                <label className="block font-semibold text-sm">Warna Teks Header</label>
-                <input
-                  type="color"
-                  value={textColorHeader}
-                  onChange={(e) => { setTextColorHeader(e.target.value); electronAPI?.setSetting('text_color_header', e.target.value) }}
-                  className="border p-1 w-full h-9"
-                />
-              </div>
+            <div>
+              <label className="block font-semibold text-sm">Warna Background</label>
+              <input
+                type="color"
+                value={bgColor}
+                onChange={(e) => {
+                  setBgColor(e.target.value)
+                  electronAPI?.setSetting('bg_color', e.target.value)
+                }}
+                className="border p-1 w-full h-9"
+              />
             </div>
 
             <div>
@@ -855,38 +871,85 @@ function Control() {
               <div className="space-y-2">
                 <div className="flex items-center gap-2">
                   <span className="w-24 text-xs">Header</span>
-                  <input type="range" min="16" max="80" value={fontSizeHeader}
-                    onChange={(e) => { const v = parseInt(e.target.value); setFontSizeHeader(v); handleSetSetting('font_size_header', v) }}
-                    className="flex-1" />
-                  <span className="text-xs w-8 text-right">{fontSizeHeader}</span>
+                  <input type="number" min="1" value={fontSizeHeader}
+                    onChange={(e) => { const v = parseInt(e.target.value) || 1; setFontSizeHeader(v); handleSetSetting('font_size_header', v) }}
+                    className="border p-1 text-xs w-20" />
                 </div>
                 <div className="flex items-center gap-2">
                   <span className="w-24 text-xs">Nama Tim</span>
-                  <input type="range" min="12" max="60" value={fontSizeTeam}
-                    onChange={(e) => { const v = parseInt(e.target.value); setFontSizeTeam(v); handleSetSetting('font_size_team', v) }}
-                    className="flex-1" />
-                  <span className="text-xs w-8 text-right">{fontSizeTeam}</span>
+                  <input type="number" min="1" value={fontSizeTeam}
+                    onChange={(e) => { const v = parseInt(e.target.value) || 1; setFontSizeTeam(v); handleSetSetting('font_size_team', v) }}
+                    className="border p-1 text-xs w-20" />
                 </div>
                 <div className="flex items-center gap-2">
                   <span className="w-24 text-xs">Skor</span>
-                  <input type="range" min="24" max="120" value={fontSizeScore}
-                    onChange={(e) => { const v = parseInt(e.target.value); setFontSizeScore(v); handleSetSetting('font_size_score', v) }}
-                    className="flex-1" />
-                  <span className="text-xs w-8 text-right">{fontSizeScore}</span>
+                  <input type="number" min="1" value={fontSizeScore}
+                    onChange={(e) => { const v = parseInt(e.target.value) || 1; setFontSizeScore(v); handleSetSetting('font_size_score', v) }}
+                    className="border p-1 text-xs w-20" />
                 </div>
                 <div className="flex items-center gap-2">
                   <span className="w-24 text-xs">Timer</span>
-                  <input type="range" min="24" max="120" value={fontSizeTimer}
-                    onChange={(e) => { const v = parseInt(e.target.value); setFontSizeTimer(v); handleSetSetting('font_size_timer', v) }}
-                    className="flex-1" />
-                  <span className="text-xs w-8 text-right">{fontSizeTimer}</span>
+                  <input type="number" min="1" value={fontSizeTimer}
+                    onChange={(e) => { const v = parseInt(e.target.value) || 1; setFontSizeTimer(v); handleSetSetting('font_size_timer', v) }}
+                    className="border p-1 text-xs w-20" />
                 </div>
                 <div className="flex items-center gap-2">
                   <span className="w-24 text-xs">Footer</span>
-                  <input type="range" min="8" max="40" value={fontSizeFooter}
-                    onChange={(e) => { const v = parseInt(e.target.value); setFontSizeFooter(v); handleSetSetting('font_size_footer', v) }}
-                    className="flex-1" />
-                  <span className="text-xs w-8 text-right">{fontSizeFooter}</span>
+                  <input type="number" min="1" value={fontSizeFooter}
+                    onChange={(e) => { const v = parseInt(e.target.value) || 1; setFontSizeFooter(v); handleSetSetting('font_size_footer', v) }}
+                    className="border p-1 text-xs w-20" />
+                </div>
+              </div>
+            </div>
+
+            {/* TEBAL / REGULER */}
+            <div>
+              <label className="block font-semibold text-sm mb-2">Ketebalan Teks</label>
+              <div className="space-y-2">
+                <div className="flex items-center gap-2">
+                  <span className="w-24 text-xs">Header</span>
+                  <select value={fontWeightHeader}
+                    onChange={(e) => { const v = e.target.value; setFontWeightHeader(v); handleSetSetting('font_weight_header', v) }}
+                    className="border p-1 text-xs w-20">
+                    <option value="bold">Bold</option>
+                    <option value="normal">Reguler</option>
+                  </select>
+                </div>
+                <div className="flex items-center gap-2">
+                  <span className="w-24 text-xs">Nama Tim</span>
+                  <select value={fontWeightTeam}
+                    onChange={(e) => { const v = e.target.value; setFontWeightTeam(v); handleSetSetting('font_weight_team', v) }}
+                    className="border p-1 text-xs w-20">
+                    <option value="bold">Bold</option>
+                    <option value="normal">Reguler</option>
+                  </select>
+                </div>
+                <div className="flex items-center gap-2">
+                  <span className="w-24 text-xs">Skor</span>
+                  <select value={fontWeightScore}
+                    onChange={(e) => { const v = e.target.value; setFontWeightScore(v); handleSetSetting('font_weight_score', v) }}
+                    className="border p-1 text-xs w-20">
+                    <option value="bold">Bold</option>
+                    <option value="normal">Reguler</option>
+                  </select>
+                </div>
+                <div className="flex items-center gap-2">
+                  <span className="w-24 text-xs">Timer</span>
+                  <select value={fontWeightTimer}
+                    onChange={(e) => { const v = e.target.value; setFontWeightTimer(v); handleSetSetting('font_weight_timer', v) }}
+                    className="border p-1 text-xs w-20">
+                    <option value="bold">Bold</option>
+                    <option value="normal">Reguler</option>
+                  </select>
+                </div>
+                <div className="flex items-center gap-2">
+                  <span className="w-24 text-xs">Footer</span>
+                  <select value={fontWeightFooter}
+                    onChange={(e) => { const v = e.target.value; setFontWeightFooter(v); handleSetSetting('font_weight_footer', v) }}
+                    className="border p-1 text-xs w-20">
+                    <option value="bold">Bold</option>
+                    <option value="normal">Reguler</option>
+                  </select>
                 </div>
               </div>
             </div>
@@ -947,10 +1010,9 @@ function Control() {
                 </div>
                 <div className="flex items-center gap-2">
                   <span className="w-24 text-xs">Gap Tim</span>
-                  <input type="range" min="0" max="300" value={teamGap}
-                    onChange={(e) => { const v = parseInt(e.target.value); setTeamGap(v); handleSetSetting('team_gap', v) }}
-                    className="flex-1" />
-                  <span className="text-xs w-8 text-right">{teamGap}px</span>
+                  <input type="number" min="1" value={teamGap}
+                    onChange={(e) => { const v = parseInt(e.target.value) || 1; setTeamGap(v); handleSetSetting('team_gap', v) }}
+                    className="border p-1 text-xs w-20" />
                 </div>
               </div>
             </div>
