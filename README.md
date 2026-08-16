@@ -13,24 +13,27 @@ Scoreboard lomba cerdas cermat masih sering menggunakan metode manual (papan tul
 
 Aplikasi ini ditujukan untuk panitia lomba cerdas cermat di sekolah, kampus, pesantren, atau instansi yang membutuhkan scoreboard digital profesional — real-time, mudah dioperasikan, dan bisa dikustomisasi tampilannya sesuai tema acara.
 
-Cerdas Cermat Scoreboard menjawab semua masalah itu dengan menghadirkan aplikasi desktop dual-window yang bekerja sepenuhnya secara lokal tanpa perlu internet. Window Display menampilkan skor di layar penonton dengan animasi real-time, sementara Control Panel digunakan operator untuk mengatur skor, timer, dan kustomisasi tampilan. Aplikasi ini mendukung manajemen tim, timer countdown dengan suara, feedback visual & audio, backup data, serta kustomisasi penuh — semua tersimpan di database lokal.
+Cerdas Cermat Scoreboard menjawab semua masalah itu dengan menghadirkan aplikasi desktop dual-window yang bekerja sepenuhnya secara lokal tanpa perlu internet. Window Display menampilkan skor di layar penonton dengan animasi real-time, sementara Control Panel digunakan operator untuk mengatur skor, timer, menampilkan soal, dan kustomisasi tampilan. Aplikasi ini mendukung manajemen tim, timer countdown dengan suara, feedback visual & audio, soal popup (JSON/CSV), backup data, serta kustomisasi penuh — semua tersimpan di database lokal.
 
 ---
 
 ## Key Features
 
-- **Manajemen Tim** — tambah/hapus tim, tampil real-time di kedua window
+- **Tab-based Control Panel** — UI terorganisir dalam tab: **Operator** (TIM, SKOR, TIMER), **Soal**, **Tampilan**, **Histori**
+- **Manajemen Tim** — tambah/hapus tim (dengan konfirmasi), tampil real-time di kedua window
 - **Skor Real-time** — tambah/kurang skor dengan animasi pop-up (+/-) di Display
 - **Timer Countdown** — start, pause, resume, reset, dengan suara tick tiap detik dan animasi pulse
-- **Feedback Visual & Audio** — overlay hijau/merah fullscreen (SVG centang/X putih 70vh) + suara benar/salah
+- **Feedback Visual & Audio** — overlay hijau/merah fullscreen (SVG centang/X putih) + suara benar/salah
+- **Soal Popup di Display** — import soal dari file **JSON/CSV** (pilihan ganda, isian, benar/salah), tampilkan/tutup per soal ke Display hanya saat aktif (jawaban tidak bocor)
+- **Kustomisasi Popup Soal** — lebar/tinggi, ukuran font, font .ttf terpisah per elemen (badge, soal, opsi), warna teks & opsi, warna+opacity background badge/opsi, padding & posisi badge/opsi, border + shadow, animasi muncul/tutup
 - **Backup & Restore** — simpan/load match ke file JSON
+- **Export PNG** — simpan tampilan Display sebagai gambar PNG
 - **Kustomisasi Header** — ubah teks header, warna, font (upload .ttf), ukuran (px), posisi offset (X/Y), bold/reguler
 - **Kustomisasi Warna Teks** — header, nama tim, skor, timer, footer — masing-masing bisa diatur sendiri
 - **Kustomisasi Background** — warna solid (color picker) atau upload gambar, lengkap dengan logo watermark (opacity bisa diatur)
 - **Kustomisasi Font** — upload font .ttf per elemen (header, nama tim, skor, timer, footer), ukuran (input number, min 1), posisi offset (X/Y), gap antar tim
 - **Bold/Reguler Toggle** — pilih bold atau reguler untuk masing-masing elemen teks
 - **Sponsor Management** — tambah logo sponsor (upload + hapus), hide sponsor toggle
-- **Card-based Control Panel** — UI terorganisir per fungsi: TIM, SKOR, TIMER, DATA, TAMPILAN
 
 ---
 
@@ -42,7 +45,7 @@ Tantangan terbesar dalam pembuatan aplikasi ini:
 2. **Native SQLite di Electron** — native module `sqlite3` harus di-rebuild ulang (`@electron/rebuild`) untuk setiap versi Electron yang berbeda
 3. **Kustomisasi tampilan real-time** — gambar/font diupload sebagai base64 dan langsung dirender tanpa restart aplikasi
 4. **Distribusi .exe portable** — satu folder portable yang bisa jalan langsung dari flashdisk tanpa instalasi
-5. **Ukuran distribusi** — file .exe ~212 MB melebihi batas 100 MB GitHub, distribusi via Google Drive
+5. **Ukuran distribusi** — file .exe ±223 MB melebihi batas 100 MB GitHub, distribusi via Google Drive
 
 ---
 
@@ -110,7 +113,7 @@ npx @electron/rebuild
 npm run build:vite
 ```
 
-Hasilnya ada di `frontend/dist/`.
+Hasilnya ada di `frontend/dist/`. _Langkah ini otomatis dijalankan oleh `npm run build:exe`, jadi bisa dilewati jika langsung build .exe._
 
 ### 3. Package dengan electron-packager
 
@@ -118,7 +121,7 @@ Hasilnya ada di `frontend/dist/`.
 npm run build:exe
 ```
 
-Proses ini akan menghasilkan folder `release/Cerdas Cermat Scoreboard-win32-x64/`. Di dalamnya ada file `Cerdas Cermat Scoreboard.exe` yang bisa dijalankan langsung (portable, tanpa instalasi).
+Script ini otomatis menjalankan `build:vite` terlebih dahulu, lalu mem-package Electron + frontend ke `release/`. Proses ini menghasilkan folder `release/Cerdas Cermat Scoreboard-win32-x64/` dengan file `Cerdas Cermat Scoreboard.exe` yang bisa dijalankan langsung (portable, tanpa instalasi).
 
 ### 4. Struktur Output
 
@@ -134,6 +137,35 @@ release/
     ├── icudtl.dat
     └── ...                            # DLL pendukung Electron
 ```
+
+### Format Soal (JSON / CSV)
+
+Soal diimport lewat tab **Soal** di Control Panel. Tipe yang didukung: `pilihan_ganda`, `isian`, `benar_salah`.
+
+**CSV** (header: `type,question,option_a,option_b,option_c,option_d`):
+
+```csv
+type,question,option_a,option_b,option_c,option_d
+pilihan_ganda,"Siapakah presiden pertama Republik Indonesia?","Ir. Soekarno","Mohammad Hatta","Soeharto","Joko Widodo"
+isian,"Berapa hasil dari 8 dikali 7?",
+benar_salah,"Matahari adalah planet.",
+```
+
+Kolom `answer` (opsional) bisa ditambahkan sebagai referensi juri — **tidak pernah dikirim ke Display**; popup hanya menampilkan soal dan opsi.
+
+**JSON** (kunci: `soal`):
+
+```json
+{
+  "soal": [
+    { "type": "pilihan_ganda", "question": "...", "option_a": "...", "option_b": "..." },
+    { "type": "isian", "question": "..." },
+    { "type": "benar_salah", "question": "..." }
+  ]
+}
+```
+
+Contoh lengkap tersedia di folder `contoh-soal/soal-contoh.csv`.
 
 ### Troubleshooting
 
