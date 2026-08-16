@@ -64,19 +64,26 @@ Tantangan terbesar dalam pembuatan aplikasi ini:
 <table>
   <tr>
     <td align="center">
-      <img src="screenshot/control panel_pengaturan skor.png" alt="Control Panel Pengaturan Skor" height="300">
+      <img src="screenshot/Control Panel_Pengaturan Skor.png" alt="Control Panel Pengaturan Skor" height="300">
       <br>
       <em>Control Panel Pengaturan Skor</em>
     </td>
     <td align="center">
-      <img src="screenshot/control panel_pengaturan tampilan_1.png" alt="Control Panel Pengaturan Tampilan 1" height="300">
+      <img src="screenshot/Control Panel_Pengaturan Display.png" alt="Control Panel Pengaturan Display" height="300">
       <br>
-      <em>Control Panel Pengaturan Tampilan 1</em>
+      <em>Control Panel Pengaturan Display</em>
+    </td>
+  </tr>
+  <tr>
+    <td align="center">
+      <img src="screenshot/Control Panel_Pengaturan Soal + Pop Up.png" alt="Control Panel Pengaturan Soal + Pop Up" height="300">
+      <br>
+      <em>Control Panel Pengaturan Soal + Pop Up</em>
     </td>
     <td align="center">
-      <img src="screenshot/control panel_pengaturan tampilan_2.png" alt="Control Panel Pengaturan Tampilan 2" height="300">
+      <img src="screenshot/Control Panel_Pengaturan History Match.png" alt="Control Panel Pengaturan History Match" height="300">
       <br>
-      <em>Control Panel Pengaturan Tampilan 2</em>
+      <em>Control Panel Pengaturan History Match</em>
     </td>
   </tr>
 </table>
