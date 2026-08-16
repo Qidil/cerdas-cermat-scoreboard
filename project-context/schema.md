@@ -137,3 +137,31 @@ teams (1) ──── (N) history
 | `pos_footer_y` | string (number) | `'0'` | Offset Y footer (px) |
 | `team_gap` | string (number) | `'80'` | Jarak antar tim (px) |
 | `hide_sponsor` | string | `'false'` | Sembunyikan sponsor (`true`/`false`) |
+| `popup_width` | string (number) | `'900'` | Lebar popup soal di Display (px) |
+| `popup_height` | string (number) | `'500'` | Tinggi popup soal di Display (px) |
+| `popup_bg_color` | string (hex) | `'#1e293b'` | Warna solid background popup soal |
+| `popup_bg_image` | string (data URL) | `''` | Gambar background popup soal |
+| `popup_font` | string (data URL) | `''` | Font .ttf untuk teks popup soal |
+| `popup_font_size` | string (number) | `'36'` | Ukuran font teks soal (px) |
+| `popup_text_color` | string (hex) | `'#ffffff'` | Warna teks popup soal |
+| `popup_option_color` | string (hex) | `'#94a3b8'` | Warna teks opsi jawaban (pilihan ganda) |
+| `popup_badge_bg_color` | string (hex) | `'#ffffff'` | Warna background badge tipe soal |
+| `popup_badge_opacity` | string (number) | `'15'` | Opacity background badge tipe soal (0-100) |
+| `popup_option_bg_color` | string (hex) | `'#ffffff'` | Warna background opsi jawaban (pilihan ganda) |
+| `popup_option_bg_opacity` | string (number) | `'10'` | Opacity background opsi jawaban (0-100) |
+| `popup_border_color` | string (hex) | `'#ffffff'` | Warna border popup soal |
+| `popup_border_width` | string (number) | `'0'` | Ketebalan border popup soal (px) |
+| `popup_shadow` | string | `'true'` | Tampilkan shadow popup soal (`true`/`false`) |
+| `popup_font_badge` | string (data URL) | `''` | Font .ttf untuk badge tipe soal (fallback: `popup_font`) |
+| `popup_font_question` | string (data URL) | `''` | Font .ttf untuk teks soal (fallback: `popup_font`) |
+| `popup_font_option` | string (data URL) | `''` | Font .ttf untuk teks opsi jawaban (fallback: `popup_font`) |
+| `popup_badge_font_size` | string (number) | `'14'` | Ukuran font badge tipe soal (px) |
+| `popup_badge_bg_padding_x` | string (number) | `'12'` | Padding horizontal background badge (px) |
+| `popup_badge_bg_padding_y` | string (number) | `'4'` | Padding vertikal background badge (px) |
+| `popup_badge_pos_x` | string (number) | `'0'` | Offset X posisi badge (px) |
+| `popup_badge_pos_y` | string (number) | `'0'` | Offset Y posisi badge (px) |
+| `popup_option_font_size` | string (number) | `'20'` | Ukuran font opsi jawaban (px) |
+| `popup_option_bg_padding_x` | string (number) | `'24'` | Padding horizontal background opsi (px) |
+| `popup_option_bg_padding_y` | string (number) | `'12'` | Padding vertikal background opsi (px) |
+| `popup_option_pos_x` | string (number) | `'0'` | Offset X posisi opsi (px) |
+| `popup_option_pos_y` | string (number) | `'0'` | Offset Y posisi opsi (px) |

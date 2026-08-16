@@ -1,10 +1,12 @@
 # Task: Cerdas Cermat Scoreboard
 
-> **Total Fase:** 4 | **Total Task:** 12 | **Terakhir diperbarui:** 30 Juli 2026
+> **Total Fase:** 7 | **Total Task:** 24 | **Terakhir diperbarui:** 16 Agustus 2026
 
 ## Aturan Eksekusi
 - Kerjakan task **satu per satu** secara berurutan dalam satu fase.
 - Setelah selesai satu **task**, **BERHENTI** dan tunggu konfirmasi user sebelum lanjut ke task berikutnya.
+- Setelah selesai satu **fase** (semua task dalam fase), jalankan **kedua gate berurutan** (spec-compliance → code-review) secara otomatis tanpa konfirmasi per gate; perbaiki temuan lalu re-run gate.
+- Konfirmasi user hanya wajib sebelum **commit / push ke GitHub**.
 - Update status `[ ]` menjadi `[x]` saat task selesai.
 - Jika task terblokir, tandai dengan `[~]` dan catat alasannya.
 
@@ -17,6 +19,154 @@
 | 2 | Bug Fix | [x] | 1/1 |
 | 3 | Packaging (.exe) | [x] | 1/1 |
 | 4 | UI/UX Enhancement | [x] | 6/6 |
+| 5 | Tab Panel + Soal Popup + Export PNG | [x] | 5/5 |
+| 6 | Revisi Popup Soal | [x] | 4/4 |
+| 7 | Kustomisasi Font & Ukuran Popup | [x] | 3/3 |
+
+---
+
+## Fase 7: Kustomisasi Font & Ukuran Popup
+> **Dependensi:** Fase 6 selesai
+> **Tujuan:** Tambah font custom per elemen (badge, soal, opsi) dan setting ukuran/posisi font & background untuk badge dan opsi jawaban di popup soal.
+
+### Task 7.1: Font custom per elemen popup
+- **File:** `frontend/src/App.jsx`, `project-context/schema.md`, `project-context/StyleGuide.md`
+- **Deskripsi:** Tambah 3 setting font custom .ttf terpisah untuk badge tipe soal, teks soal, dan teks opsi jawaban. `popup_font` lama tetap sebagai fallback.
+- **Traceability:** `REV-7.1`
+- **Acceptance Criteria:**
+  - [x] Badge tipe soal memakai font custom sendiri bila diisi
+  - [x] Teks soal memakai font custom sendiri bila diisi
+  - [x] Teks opsi jawaban memakai font custom sendiri bila diisi
+  - [x] Bila font elemen kosong, fallback ke `popup_font`
+  - [x] Setting tersimpan persistent dan diterapkan real-time
+
+### Task 7.2: Setting ukuran font & background badge
+- **File:** `frontend/src/App.jsx`, `project-context/schema.md`, `project-context/StyleGuide.md`
+- **Deskripsi:** Tambah setting ukuran font badge (px), padding background badge X/Y (px), dan offset posisi badge X/Y (px).
+- **Traceability:** `REV-7.2`
+- **Acceptance Criteria:**
+  - [x] Ukuran font badge bisa diatur (px)
+  - [x] Padding background badge X/Y bisa diatur (px)
+  - [x] Posisi badge X/Y bisa diatur (px)
+  - [x] Setting tersimpan persistent dan diterapkan real-time
+
+### Task 7.3: Setting ukuran font & background opsi jawaban
+- **File:** `frontend/src/App.jsx`, `project-context/schema.md`, `project-context/StyleGuide.md`
+- **Deskripsi:** Tambah setting ukuran font opsi (px), padding background opsi X/Y (px), dan offset posisi opsi X/Y (px).
+- **Traceability:** `REV-7.3`
+- **Acceptance Criteria:**
+  - [x] Ukuran font opsi bisa diatur (px)
+  - [x] Padding background opsi X/Y bisa diatur (px)
+  - [x] Posisi opsi X/Y bisa diatur (px)
+  - [x] Setting tersimpan persistent dan diterapkan real-time
+
+---
+
+## Fase 6: Revisi Popup Soal
+> **Dependensi:** Fase 5 selesai
+> **Tujuan:** Perbaikan popup soal berdasarkan feedback user: animasi muncul/tutup, posisi badge, warna+opacity badge & opsi, dan border+shadow popup.
+
+### Task 6.1: Animasi popup muncul & tertutup
+- **File:** `frontend/src/App.jsx`, `frontend/tailwind.config.js`
+- **Deskripsi:** Tambah animasi transisi saat popup soal muncul di Display dan saat ditutup.
+- **Traceability:** `REV-6.1`
+- **Acceptance Criteria:**
+  - [x] Popup muncul dengan animasi (bukan langsung tampil)
+  - [x] Popup tertutup dengan animasi (bukan langsung hilang)
+  - [x] Animasi tidak memblokir interaksi lain
+
+### Task 6.2: Posisi badge tipe soal
+- **File:** `frontend/src/App.jsx`
+- **Deskripsi:** Pindahkan badge tipe soal (Pilihan Ganda / Isian / Benar-Salah) ke pojok kiri atas popup.
+- **Traceability:** `REV-6.2`
+- **Acceptance Criteria:**
+  - [x] Badge berada di pojok kiri atas popup
+  - [x] Teks badge tetap terbaca
+
+### Task 6.3: Setting warna & opacity badge + opsi
+- **File:** `frontend/src/App.jsx`, `project-context/schema.md`, `project-context/StyleGuide.md`
+- **Deskripsi:** Tambah setting untuk warna background badge tipe soal dan background opsi jawaban, masing-masing dengan warna + opacity.
+- **Traceability:** `REV-6.3`
+- **Acceptance Criteria:**
+  - [x] Warna background badge tipe soal bisa diatur (hex) + opacity
+  - [x] Warna background opsi jawaban bisa diatur (hex) + opacity
+  - [x] Setting tersimpan persistent di database
+  - [x] Display menerapkan setting real-time
+
+### Task 6.4: Setting border & shadow popup
+- **File:** `frontend/src/App.jsx`, `project-context/schema.md`, `project-context/StyleGuide.md`
+- **Deskripsi:** Tambah setting border popup (warna + ketebalan) dan opsi tampilkan/sembunyikan shadow.
+- **Traceability:** `REV-6.4`
+- **Acceptance Criteria:**
+  - [x] Warna border popup bisa diatur (hex)
+  - [x] Ketebalan border popup bisa diatur (px)
+  - [x] Opsi tampilkan/sembunyikan shadow tersedia
+  - [x] Setting tersimpan persistent dan diterapkan real-time
+
+---
+
+## Fase 5: Tab Panel + Soal Popup + Export PNG
+> **Dependensi:** Fase 1-4 selesai
+> **Tujuan:** Refactor Control Panel menjadi 4 tab (Operator, Soal, Tampilan, Histori), tambah popup soal di Display, dan fitur export gambar Display ke PNG.
+
+### Task 5.1: Backend — IPC soal & export PNG
+- **File:** `main.js`, `preload.js`
+- **Deskripsi:** Tambah IPC handler untuk `show-question`, `hide-question`, dan `export-display-png` (capturePage + dialog save).
+- **Referensi:** `project-context/api.md#10-soal-question-display`, `project-context/api.md#11-export-display-png`
+- **Traceability:** `FEAT-5.1`
+- **Acceptance Criteria:**
+  - [x] `show-question` mengirim soal ke Display window
+  - [x] `hide-question` mengirim perintah tutup popup ke Display window
+  - [x] `export-display-png` mengambil screenshot Display saat itu dan menyimpan via dialog
+  - [x] Semua fungsi baru di-expose via `contextBridge` di `preload.js`
+
+### Task 5.2: Frontend — Tab structure Control Panel
+- **File:** `frontend/src/App.jsx`
+- **Deskripsi:** Refactor Control Panel menjadi 4 tab dengan navigasi di atas: Operator (TIM/SKOR/TIMER), Soal, Tampilan, Histori.
+- **Referensi:** `project-context/PRD.md#48-tab-structure-control-panel`
+- **Traceability:** `FEAT-5.2`
+- **Acceptance Criteria:**
+  - [x] 4 tab muncul dalam urutan: Operator, Soal, Tampilan, Histori
+  - [x] Konten tab aktif saja yang dirender (tidak scroll panjang)
+  - [x] Card TIM/SKOR/TIMER ada di tab Operator
+  - [x] Pengaturan tampilan ada di tab Tampilan
+  - [x] Save/Load match + history + export PNG ada di tab Histori
+
+### Task 5.3: Frontend — Tab Soal (import JSON/CSV + popup)
+- **File:** `frontend/src/App.jsx`
+- **Deskripsi:** Buat tab Soal: upload file .json/.csv, parse ke struktur internal, daftar soal, klik soal untuk toggle popup di Display.
+- **Referensi:** `project-context/improvement.md#3-tab-soal--popup-soal-di-display-fitur-baru`
+- **Traceability:** `FEAT-5.3`
+- **Acceptance Criteria:**
+  - [x] Upload file .json dan .csv didukung (CSV dikonversi ke JSON internal)
+  - [x] CSV memakai kolom: `type,question,option_a,option_b,option_c,option_d,answer`
+  - [x] 3 tipe soal dirender benar: pilihan ganda, isian, benar/salah
+  - [x] Klik soal → popup muncul di Display; klik lagi → popup hilang
+  - [x] Klik soal lain saat popup aktif → konten popup berganti
+
+### Task 5.4: Frontend — Popup soal di Display
+- **File:** `frontend/src/App.jsx`
+- **Deskripsi:** Display menerima event `show-question`/`hide-question`, menampilkan popup soal dengan pengaturan dari settings.
+- **Referensi:** `project-context/improvement.md#3-tab-soal--popup-soal-di-display-fitur-baru`
+- **Traceability:** `FEAT-5.4`
+- **Acceptance Criteria:**
+  - [x] Popup menampilkan soal besar dan terbaca dari jauh
+  - [x] Pilihan ganda menampilkan opsi A/B/C/D; isian & benar/salah hanya teks soal
+  - [x] Ukuran, font, warna, background popup mengikuti settings
+  - [x] Jawaban tidak pernah ditampilkan di Display
+  - [x] Soal hilang total dari DOM saat ditutup (bukan hanya CSS hidden)
+
+### Task 5.5: Frontend — Setting popup di tab Tampilan + Export PNG di tab Histori
+- **File:** `frontend/src/App.jsx`
+- **Deskripsi:** Tambah pengaturan popup soal (ukuran, font, warna, background) di tab Tampilan. Tambah tombol export PNG di tab Histori.
+- **Referensi:** `project-context/improvement.md#3-tab-soal--popup-soal-di-display-fitur-baru`
+- **Traceability:** `FEAT-5.5`
+- **Acceptance Criteria:**
+  - [x] Tab Tampilan punya setting ukuran popup (w/h px)
+  - [x] Tab Tampilan punya setting font & ukuran font popup + warna teks
+  - [x] Tab Tampilan punya setting background popup (warna solid / gambar)
+  - [x] Tab Histori punya tombol export PNG yang memanggil `exportDisplayPng()`
+  - [x] Export berhasil menyimpan gambar tampilan Display saat itu
 
 ---
 

@@ -301,6 +301,44 @@ Semua API di-expose ke renderer via `contextBridge` di `preload.js` sebagai `win
 
 ---
 
+## 10. Soal (Question Display)
+
+### 10.1 Show Question
+
+| | |
+|---|---|
+| **Pattern** | send / on |
+| **Channel** | `show-question` |
+| **Trigger** | `electronAPI.showQuestion(soal)` |
+| **Payload** | `{ id: string, type: 'pilihan_ganda' \| 'isian' \| 'benar_salah', question: string, options?: string[], answer?: string }` |
+| **Effect** | Mengirim soal ke Display — ditampilkan sebagai popup |
+| **Broadcast** | `show-question` → Display |
+
+### 10.2 Hide Question
+
+| | |
+|---|---|
+| **Pattern** | send / on |
+| **Channel** | `hide-question` |
+| **Trigger** | `electronAPI.hideQuestion()` |
+| **Effect** | Menghapus popup soal dari Display |
+| **Broadcast** | `hide-question` → Display |
+
+---
+
+## 11. Export Display PNG
+
+| | |
+|---|---|
+| **Pattern** | handle / invoke |
+| **Channel** | `export-display-png` |
+| **Trigger** | `electronAPI.exportDisplayPng()` |
+| **Effect** | `displayWindow.webContents.capturePage()` → dialog pilih lokasi → simpan file PNG |
+| **Response** | `{ canceled: boolean, filePath?: string }` — status export |
+| **Target** | Control (tab Histori) |
+
+---
+
 ## Ringkasan Channel
 
 | Channel | Type | Direction | Payload |
@@ -333,3 +371,8 @@ Semua API di-expose ke renderer via `contextBridge` di `preload.js` sebagai `win
 | `timer-visibility` | send→on | main→renderer | `boolean` |
 | `settings-updated` | send→on | main→renderer | `{ key, value }` |
 | `operation-error` | send→on | main→renderer | `string` (error message) |
+| `show-question` | send→on | renderer→main | `object` (soal) |
+| `hide-question` | send→on | renderer→main | — |
+| `export-display-png` | invoke→handle | renderer→main | — |
+| `show-question` (broadcast) | send→on | main→renderer | `object` (soal) |
+| `hide-question` (broadcast) | send→on | main→renderer | — |

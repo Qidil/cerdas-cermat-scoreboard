@@ -78,6 +78,42 @@ Aplikasi desktop untuk menampilkan skor lomba cerdas cermat (dan sejenisnya) sec
 | Window title | Display window title "Display", Control Panel title "Control Panel" |
 | Favicon | Ikon "CC" di taskbar via `favicon.ico` + `favicon.svg` untuk browser |
 
+### 4.8 Tab Structure Control Panel
+| Fitur | Detail |
+|---|---|
+| 4 tab | Operator, Soal, Tampilan, Histori (dalam urutan ini) |
+| Navigasi tab | Menu tab di bagian atas Control Panel, konten tab aktif saja yang dirender |
+| Tujuan | Menghilangkan scroll panjang ke bawah |
+
+### 4.9 Popup Soal di Display
+| Fitur | Detail |
+|---|---|
+| Import soal | Load file **JSON** atau **CSV** (CSV dikonversi ke JSON internal) dari tab Soal |
+| 3 tipe soal | Pilihan ganda (opsi A/B/C/D), isian, benar/salah |
+| Tampil popup | Operator klik satu soal → soal tampil sebagai popup di Display |
+| Tutup popup | Operator klik lagi soal yang sama → popup tertutup |
+| Satu soal aktif | Klik soal lain saat ada popup = ganti konten popup |
+| Jawaban | Tidak ditampilkan di Display (hanya untuk data/referensi juri) |
+| Pengaturan popup | Ukuran, ukuran font, jenis font, warna teks, background (gambar atau solid) — diatur dari tab Tampilan |
+| Setting badge | Warna background badge tipe soal + opacity (0-100) — diatur dari tab Tampilan |
+| Setting opsi | Warna background opsi jawaban + opacity (0-100) — diatur dari tab Tampilan |
+| Setting border | Warna border + ketebalan border (px) popup — diatur dari tab Tampilan |
+| Setting shadow | Toggle tampilkan/sembunyikan shadow popup — diatur dari tab Tampilan |
+| Animasi popup | Muncul fade-in + scale (`popup-in`), tertutup fade-out (`popup-out`) |
+| Font per elemen | Font custom .ttf terpisah untuk badge, teks soal, dan teks opsi (fallback ke font popup global) |
+| Ukuran badge | Ukuran font + padding background (X/Y) + offset posisi (X/Y) badge tipe soal |
+| Ukuran opsi | Ukuran font + padding background (X/Y) + offset posisi (X/Y) opsi jawaban |
+| Keamanan | Soal dikirim ke Display hanya saat ditampilkan (tidak di-broadcast semua) |
+
+### 4.10 Tab Histori & Export Gambar
+| Fitur | Detail |
+|---|---|
+| History | Daftar aktivitas lomba (tambah/hapus tim, +/- skor) |
+| Save / Load match | Backup & restore data match (dari card DATA yang lama) |
+| Export gambar | Simpan tampilan Display **saat itu** sebagai file PNG |
+| Lokasi export | Dialog pilih folder & nama file (`dialog.showSaveDialog`) |
+| Teknologi | `webContents.capturePage()` → simpan via `fs` |
+
 ## 5. Business Rules
 
 | No | Rule | Detail |
@@ -91,6 +127,9 @@ Aplikasi desktop untuk menampilkan skor lomba cerdas cermat (dan sejenisnya) sec
 | BR-07 | Display hanya menampilkan | Tidak ada interaksi user di Display window |
 | BR-08 | Skor tidak boleh negatif | Validasi `if (type === 'minus' && team.score - value < 0)` |
 | BR-09 | Feedback suara tidak tumpang tindih | Sound di-reset sebelum play via `audioRef.current.pause()` + `currentTime = 0` |
+| BR-10 | Soal tidak bocor ke Display | Soal dikirim via IPC hanya saat ditampilkan, bukan di-broadcast semua di awal |
+| BR-11 | Satu popup soal aktif | Klik soal lain saat popup aktif = ganti konten; klik soal sama = tutup |
+| BR-12 | Jawaban tidak tampil di Display | Popup hanya menampilkan soal (dan opsi untuk pilihan ganda) |
 
 ## 6. Non-Goals
 

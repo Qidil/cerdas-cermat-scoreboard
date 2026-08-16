@@ -10,7 +10,9 @@ export default {
         'score-pop': 'scorePop 1s ease-out forwards',
         'fade-zoom': 'fadeZoom 0.6s ease-out',
         'timer-pulse': 'timerPulse 1s infinite',
-        'flicker': 'flicker 0.1s ease-in-out 3'
+        'flicker': 'flicker 0.1s ease-in-out 3',
+        'popup-in': 'popupIn 0.25s ease-out',
+        'popup-out': 'popupOut 0.2s ease-in forwards'
     },
     keyframes: {
         scorePop: {
@@ -29,6 +31,14 @@ export default {
         flicker: {
             '0%, 100%': { opacity: '1' },
             '50%': { opacity: '0' }
+        },
+        popupIn: {
+            '0%': { opacity: '0', transform: 'scale(0.9)' },
+            '100%': { opacity: '1', transform: 'scale(1)' }
+        },
+        popupOut: {
+            '0%': { opacity: '1', transform: 'scale(1)' },
+            '100%': { opacity: '0', transform: 'scale(0.9)' }
         }
     }
     },

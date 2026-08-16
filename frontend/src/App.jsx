@@ -6,6 +6,15 @@ import tickSoundFile from './assets/sounds/tick.mp3'
 
 const electronAPI = window.electronAPI
 
+const hexToRgba = (hex, opacity) => {
+  const h = (hex || '').replace('#', '')
+  const r = parseInt(h.slice(0, 2), 16)
+  const g = parseInt(h.slice(2, 4), 16)
+  const b = parseInt(h.slice(4, 6), 16)
+  if ([r, g, b].some((v) => isNaN(v))) return 'transparent'
+  return `rgba(${r},${g},${b},${opacity / 100})`
+}
+
 function Display() {
   const [teams, setTeams] = useState([])
   const [effect, setEffect] = useState(null)
@@ -56,6 +65,37 @@ function Display() {
   const [fontWeightScore, setFontWeightScore] = useState('bold')
   const [fontWeightTimer, setFontWeightTimer] = useState('bold')
   const [fontWeightFooter, setFontWeightFooter] = useState('normal')
+  const [activeSoal, setActiveSoal] = useState(null)
+  const [popupWidth, setPopupWidth] = useState(900)
+  const [popupHeight, setPopupHeight] = useState(500)
+  const [popupBgColor, setPopupBgColor] = useState('#1e293b')
+  const [popupBgImage, setPopupBgImage] = useState('')
+  const [popupFont, setPopupFont] = useState('')
+  const [popupFontSize, setPopupFontSize] = useState(36)
+  const [popupTextColor, setPopupTextColor] = useState('#ffffff')
+  const [popupOptionColor, setPopupOptionColor] = useState('#94a3b8')
+  const [popupBadgeBgColor, setPopupBadgeBgColor] = useState('#ffffff')
+  const [popupBadgeOpacity, setPopupBadgeOpacity] = useState(15)
+  const [popupOptionBgColor, setPopupOptionBgColor] = useState('#ffffff')
+  const [popupOptionBgOpacity, setPopupOptionBgOpacity] = useState(10)
+  const [popupBorderColor, setPopupBorderColor] = useState('#ffffff')
+  const [popupBorderWidth, setPopupBorderWidth] = useState(0)
+  const [popupShadow, setPopupShadow] = useState(true)
+  const [popupClosing, setPopupClosing] = useState(false)
+  const popupCloseTimer = useRef(null)
+  const [popupFontBadge, setPopupFontBadge] = useState('')
+  const [popupFontQuestion, setPopupFontQuestion] = useState('')
+  const [popupFontOption, setPopupFontOption] = useState('')
+  const [popupBadgeFontSize, setPopupBadgeFontSize] = useState(14)
+  const [popupBadgeBgPaddingX, setPopupBadgeBgPaddingX] = useState(12)
+  const [popupBadgeBgPaddingY, setPopupBadgeBgPaddingY] = useState(4)
+  const [popupBadgePosX, setPopupBadgePosX] = useState(0)
+  const [popupBadgePosY, setPopupBadgePosY] = useState(0)
+  const [popupOptionFontSize, setPopupOptionFontSize] = useState(20)
+  const [popupOptionBgPaddingX, setPopupOptionBgPaddingX] = useState(24)
+  const [popupOptionBgPaddingY, setPopupOptionBgPaddingY] = useState(12)
+  const [popupOptionPosX, setPopupOptionPosX] = useState(0)
+  const [popupOptionPosY, setPopupOptionPosY] = useState(0)
 
   useEffect(() => {
     if (!electronAPI) return
@@ -105,6 +145,34 @@ function Display() {
       if (settings.font_weight_score) setFontWeightScore(settings.font_weight_score)
       if (settings.font_weight_timer) setFontWeightTimer(settings.font_weight_timer)
       if (settings.font_weight_footer) setFontWeightFooter(settings.font_weight_footer)
+      if (settings.popup_width) setPopupWidth(parseInt(settings.popup_width))
+      if (settings.popup_height) setPopupHeight(parseInt(settings.popup_height))
+      if (settings.popup_bg_color) setPopupBgColor(settings.popup_bg_color)
+      if (settings.popup_bg_image) setPopupBgImage(settings.popup_bg_image)
+      if (settings.popup_font) setPopupFont(settings.popup_font)
+      if (settings.popup_font_size) setPopupFontSize(parseInt(settings.popup_font_size))
+      if (settings.popup_text_color) setPopupTextColor(settings.popup_text_color)
+      if (settings.popup_option_color) setPopupOptionColor(settings.popup_option_color)
+      if (settings.popup_badge_bg_color) setPopupBadgeBgColor(settings.popup_badge_bg_color)
+      if (settings.popup_badge_opacity) setPopupBadgeOpacity(parseInt(settings.popup_badge_opacity))
+      if (settings.popup_option_bg_color) setPopupOptionBgColor(settings.popup_option_bg_color)
+      if (settings.popup_option_bg_opacity) setPopupOptionBgOpacity(parseInt(settings.popup_option_bg_opacity))
+      if (settings.popup_border_color) setPopupBorderColor(settings.popup_border_color)
+      if (settings.popup_border_width) setPopupBorderWidth(parseInt(settings.popup_border_width))
+      if (settings.popup_shadow) setPopupShadow(settings.popup_shadow === 'true')
+      if (settings.popup_font_badge) setPopupFontBadge(settings.popup_font_badge)
+      if (settings.popup_font_question) setPopupFontQuestion(settings.popup_font_question)
+      if (settings.popup_font_option) setPopupFontOption(settings.popup_font_option)
+      if (settings.popup_badge_font_size) setPopupBadgeFontSize(parseInt(settings.popup_badge_font_size))
+      if (settings.popup_badge_bg_padding_x) setPopupBadgeBgPaddingX(parseInt(settings.popup_badge_bg_padding_x))
+      if (settings.popup_badge_bg_padding_y) setPopupBadgeBgPaddingY(parseInt(settings.popup_badge_bg_padding_y))
+      if (settings.popup_badge_pos_x) setPopupBadgePosX(parseInt(settings.popup_badge_pos_x))
+      if (settings.popup_badge_pos_y) setPopupBadgePosY(parseInt(settings.popup_badge_pos_y))
+      if (settings.popup_option_font_size) setPopupOptionFontSize(parseInt(settings.popup_option_font_size))
+      if (settings.popup_option_bg_padding_x) setPopupOptionBgPaddingX(parseInt(settings.popup_option_bg_padding_x))
+      if (settings.popup_option_bg_padding_y) setPopupOptionBgPaddingY(parseInt(settings.popup_option_bg_padding_y))
+      if (settings.popup_option_pos_x) setPopupOptionPosX(parseInt(settings.popup_option_pos_x))
+      if (settings.popup_option_pos_y) setPopupOptionPosY(parseInt(settings.popup_option_pos_y))
     })
 
     electronAPI.onSettingsUpdate((data) => {
@@ -147,6 +215,34 @@ function Display() {
         case 'font_weight_score': setFontWeightScore(data.value); break
         case 'font_weight_timer': setFontWeightTimer(data.value); break
         case 'font_weight_footer': setFontWeightFooter(data.value); break
+        case 'popup_width': setPopupWidth(parseInt(data.value)); break
+        case 'popup_height': setPopupHeight(parseInt(data.value)); break
+        case 'popup_bg_color': setPopupBgColor(data.value); break
+        case 'popup_bg_image': setPopupBgImage(data.value); break
+        case 'popup_font': setPopupFont(data.value); break
+        case 'popup_font_size': setPopupFontSize(parseInt(data.value)); break
+        case 'popup_text_color': setPopupTextColor(data.value); break
+        case 'popup_option_color': setPopupOptionColor(data.value); break
+        case 'popup_badge_bg_color': setPopupBadgeBgColor(data.value); break
+        case 'popup_badge_opacity': setPopupBadgeOpacity(parseInt(data.value)); break
+        case 'popup_option_bg_color': setPopupOptionBgColor(data.value); break
+        case 'popup_option_bg_opacity': setPopupOptionBgOpacity(parseInt(data.value)); break
+        case 'popup_border_color': setPopupBorderColor(data.value); break
+        case 'popup_border_width': setPopupBorderWidth(parseInt(data.value)); break
+        case 'popup_shadow': setPopupShadow(data.value === 'true'); break
+        case 'popup_font_badge': setPopupFontBadge(data.value); break
+        case 'popup_font_question': setPopupFontQuestion(data.value); break
+        case 'popup_font_option': setPopupFontOption(data.value); break
+        case 'popup_badge_font_size': setPopupBadgeFontSize(parseInt(data.value)); break
+        case 'popup_badge_bg_padding_x': setPopupBadgeBgPaddingX(parseInt(data.value)); break
+        case 'popup_badge_bg_padding_y': setPopupBadgeBgPaddingY(parseInt(data.value)); break
+        case 'popup_badge_pos_x': setPopupBadgePosX(parseInt(data.value)); break
+        case 'popup_badge_pos_y': setPopupBadgePosY(parseInt(data.value)); break
+        case 'popup_option_font_size': setPopupOptionFontSize(parseInt(data.value)); break
+        case 'popup_option_bg_padding_x': setPopupOptionBgPaddingX(parseInt(data.value)); break
+        case 'popup_option_bg_padding_y': setPopupOptionBgPaddingY(parseInt(data.value)); break
+        case 'popup_option_pos_x': setPopupOptionPosX(parseInt(data.value)); break
+        case 'popup_option_pos_y': setPopupOptionPosY(parseInt(data.value)); break
       }
     })
   }, [])
@@ -201,12 +297,42 @@ function Display() {
   }, [])
 
   useEffect(() => {
+    if (!electronAPI) return
+
+    electronAPI.onShowQuestion((soal) => {
+      if (popupCloseTimer.current) {
+        clearTimeout(popupCloseTimer.current)
+        popupCloseTimer.current = null
+      }
+      setPopupClosing(false)
+      setActiveSoal(soal)
+    })
+
+    electronAPI.onHideQuestion(() => {
+      setPopupClosing(true)
+      popupCloseTimer.current = setTimeout(() => {
+        setActiveSoal(null)
+        setPopupClosing(false)
+        popupCloseTimer.current = null
+      }, 200)
+    })
+
+    return () => {
+      if (popupCloseTimer.current) clearTimeout(popupCloseTimer.current)
+    }
+  }, [])
+
+  useEffect(() => {
     const fonts = [
       { data: fontHeader, name: 'CerdasHeader' },
       { data: fontTeam, name: 'CerdasTeam' },
       { data: fontScore, name: 'CerdasScore' },
       { data: fontTimer, name: 'CerdasTimer' },
       { data: fontFooter, name: 'CerdasFooter' },
+      { data: popupFont, name: 'CerdasPopup' },
+      { data: popupFontBadge, name: 'CerdasPopupBadge' },
+      { data: popupFontQuestion, name: 'CerdasPopupQuestion' },
+      { data: popupFontOption, name: 'CerdasPopupOption' },
     ]
     Promise.all(fonts.map((f) => {
       if (!f.data) return Promise.resolve()
@@ -215,7 +341,7 @@ function Display() {
         document.fonts.add(fontFace)
       }).catch(() => {})
     }))
-  }, [fontHeader, fontTeam, fontScore, fontTimer, fontFooter])
+  }, [fontHeader, fontTeam, fontScore, fontTimer, fontFooter, popupFont, popupFontBadge, popupFontQuestion, popupFontOption])
 
   return (
     <div
@@ -298,6 +424,72 @@ function Display() {
         </div>
       )}
 
+      {activeSoal && (
+        <div className={`absolute inset-0 flex items-center justify-center z-40 p-10 ${popupClosing ? 'animate-popup-out' : 'animate-popup-in'}`}>
+          <div
+            className={`relative rounded-lg flex flex-col justify-center items-center text-center p-10 ${popupShadow ? 'shadow-2xl' : ''}`}
+            style={{
+              width: `${popupWidth}px`,
+              height: `${popupHeight}px`,
+              maxWidth: '100%',
+              maxHeight: '100%',
+              backgroundColor: popupBgColor,
+              backgroundImage: popupBgImage ? `url(${popupBgImage})` : undefined,
+              backgroundSize: 'cover',
+              backgroundPosition: 'center',
+              color: popupTextColor,
+              fontFamily: popupFont ? 'CerdasPopup' : undefined,
+              border: popupBorderWidth > 0 ? `${popupBorderWidth}px solid ${popupBorderColor}` : undefined,
+            }}
+          >
+            <span
+              className="absolute top-3 left-3 rounded-full font-bold uppercase tracking-widest"
+              style={{
+                backgroundColor: hexToRgba(popupBadgeBgColor, popupBadgeOpacity),
+                color: popupOptionColor,
+                fontFamily: popupFontBadge ? 'CerdasPopupBadge' : undefined,
+                fontSize: `${popupBadgeFontSize}px`,
+                padding: `${popupBadgeBgPaddingY}px ${popupBadgeBgPaddingX}px`,
+                transform: `translate(${popupBadgePosX}px, ${popupBadgePosY}px)`,
+              }}
+            >
+              {activeSoal.type === 'pilihan_ganda' ? 'Pilihan Ganda' : activeSoal.type === 'benar_salah' ? 'Benar / Salah' : 'Isian'}
+            </span>
+            <p
+              className="tracking-wide leading-relaxed"
+              style={{ fontSize: `${popupFontSize}px`, fontWeight: 'bold', fontFamily: popupFontQuestion ? 'CerdasPopupQuestion' : undefined }}
+            >
+              {activeSoal.question}
+            </p>
+            {activeSoal.type === 'pilihan_ganda' && activeSoal.options && (
+              <div
+                className="mt-8 grid gap-3"
+                style={{ gridTemplateColumns: activeSoal.options.length > 2 ? '1fr 1fr' : '1fr' }}
+              >
+                {activeSoal.options.map((opt, i) => (
+                  <div
+                    key={i}
+                    className="rounded text-left"
+                    style={{
+                      backgroundColor: hexToRgba(popupOptionBgColor, popupOptionBgOpacity),
+                      color: popupOptionColor,
+                      fontSize: `${popupOptionFontSize}px`,
+                      fontWeight: 'bold',
+                      fontFamily: popupFontOption ? 'CerdasPopupOption' : undefined,
+                      padding: `${popupOptionBgPaddingY}px ${popupOptionBgPaddingX}px`,
+                      transform: `translate(${popupOptionPosX}px, ${popupOptionPosY}px)`,
+                    }}
+                  >
+                    <span className="mr-2 font-bold">{String.fromCharCode(65 + i)}.</span>
+                    {opt}
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        </div>
+      )}
+
       {feedback && (
         <div
           className={`absolute inset-0 flex items-center justify-center ${
@@ -346,7 +538,38 @@ function Control() {
   const [textColorScore, setTextColorScore] = useState('#ffffff')
   const [textColorTimer, setTextColorTimer] = useState('#ffffff')
   const [textColorFooter, setTextColorFooter] = useState('#ffffff')
-  const [showSettings, setShowSettings] = useState(false)
+  const [activeTab, setActiveTab] = useState('operator')
+  const [soalList, setSoalList] = useState([])
+  const [activeSoalId, setActiveSoalId] = useState(null)
+  const [popupWidth, setPopupWidth] = useState(900)
+  const [popupHeight, setPopupHeight] = useState(500)
+  const [popupBgColor, setPopupBgColor] = useState('#1e293b')
+  const [popupBgImage, setPopupBgImage] = useState('')
+  const [popupFont, setPopupFont] = useState('')
+  const [popupFontSize, setPopupFontSize] = useState(36)
+  const [popupTextColor, setPopupTextColor] = useState('#ffffff')
+  const [popupOptionColor, setPopupOptionColor] = useState('#94a3b8')
+  const [popupBadgeBgColor, setPopupBadgeBgColor] = useState('#ffffff')
+  const [popupBadgeOpacity, setPopupBadgeOpacity] = useState(15)
+  const [popupOptionBgColor, setPopupOptionBgColor] = useState('#ffffff')
+  const [popupOptionBgOpacity, setPopupOptionBgOpacity] = useState(10)
+  const [popupBorderColor, setPopupBorderColor] = useState('#ffffff')
+  const [popupBorderWidth, setPopupBorderWidth] = useState(0)
+  const [popupShadow, setPopupShadow] = useState(true)
+  const [popupFontBadge, setPopupFontBadge] = useState('')
+  const [popupFontQuestion, setPopupFontQuestion] = useState('')
+  const [popupFontOption, setPopupFontOption] = useState('')
+  const [popupBadgeFontSize, setPopupBadgeFontSize] = useState(14)
+  const [popupBadgeBgPaddingX, setPopupBadgeBgPaddingX] = useState(12)
+  const [popupBadgeBgPaddingY, setPopupBadgeBgPaddingY] = useState(4)
+  const [popupBadgePosX, setPopupBadgePosX] = useState(0)
+  const [popupBadgePosY, setPopupBadgePosY] = useState(0)
+  const [popupOptionFontSize, setPopupOptionFontSize] = useState(20)
+  const [popupOptionBgPaddingX, setPopupOptionBgPaddingX] = useState(24)
+  const [popupOptionBgPaddingY, setPopupOptionBgPaddingY] = useState(12)
+  const [popupOptionPosX, setPopupOptionPosX] = useState(0)
+  const [popupOptionPosY, setPopupOptionPosY] = useState(0)
+  const [exporting, setExporting] = useState(false)
   const [fontHeader, setFontHeader] = useState('')
   const [fontHeaderName, setFontHeaderName] = useState('')
   const [fontTeam, setFontTeam] = useState('')
@@ -452,6 +675,34 @@ function Control() {
       if (settings.font_weight_score) setFontWeightScore(settings.font_weight_score)
       if (settings.font_weight_timer) setFontWeightTimer(settings.font_weight_timer)
       if (settings.font_weight_footer) setFontWeightFooter(settings.font_weight_footer)
+      if (settings.popup_width) setPopupWidth(parseInt(settings.popup_width))
+      if (settings.popup_height) setPopupHeight(parseInt(settings.popup_height))
+      if (settings.popup_bg_color) setPopupBgColor(settings.popup_bg_color)
+      if (settings.popup_bg_image) setPopupBgImage(settings.popup_bg_image)
+      if (settings.popup_font) setPopupFont(settings.popup_font)
+      if (settings.popup_font_size) setPopupFontSize(parseInt(settings.popup_font_size))
+      if (settings.popup_text_color) setPopupTextColor(settings.popup_text_color)
+      if (settings.popup_option_color) setPopupOptionColor(settings.popup_option_color)
+      if (settings.popup_badge_bg_color) setPopupBadgeBgColor(settings.popup_badge_bg_color)
+      if (settings.popup_badge_opacity) setPopupBadgeOpacity(parseInt(settings.popup_badge_opacity))
+      if (settings.popup_option_bg_color) setPopupOptionBgColor(settings.popup_option_bg_color)
+      if (settings.popup_option_bg_opacity) setPopupOptionBgOpacity(parseInt(settings.popup_option_bg_opacity))
+      if (settings.popup_border_color) setPopupBorderColor(settings.popup_border_color)
+      if (settings.popup_border_width) setPopupBorderWidth(parseInt(settings.popup_border_width))
+      if (settings.popup_shadow) setPopupShadow(settings.popup_shadow === 'true')
+      if (settings.popup_font_badge) setPopupFontBadge(settings.popup_font_badge)
+      if (settings.popup_font_question) setPopupFontQuestion(settings.popup_font_question)
+      if (settings.popup_font_option) setPopupFontOption(settings.popup_font_option)
+      if (settings.popup_badge_font_size) setPopupBadgeFontSize(parseInt(settings.popup_badge_font_size))
+      if (settings.popup_badge_bg_padding_x) setPopupBadgeBgPaddingX(parseInt(settings.popup_badge_bg_padding_x))
+      if (settings.popup_badge_bg_padding_y) setPopupBadgeBgPaddingY(parseInt(settings.popup_badge_bg_padding_y))
+      if (settings.popup_badge_pos_x) setPopupBadgePosX(parseInt(settings.popup_badge_pos_x))
+      if (settings.popup_badge_pos_y) setPopupBadgePosY(parseInt(settings.popup_badge_pos_y))
+      if (settings.popup_option_font_size) setPopupOptionFontSize(parseInt(settings.popup_option_font_size))
+      if (settings.popup_option_bg_padding_x) setPopupOptionBgPaddingX(parseInt(settings.popup_option_bg_padding_x))
+      if (settings.popup_option_bg_padding_y) setPopupOptionBgPaddingY(parseInt(settings.popup_option_bg_padding_y))
+      if (settings.popup_option_pos_x) setPopupOptionPosX(parseInt(settings.popup_option_pos_x))
+      if (settings.popup_option_pos_y) setPopupOptionPosY(parseInt(settings.popup_option_pos_y))
 
       setIsLoading(false)
     })
@@ -497,6 +748,147 @@ function Control() {
     electronAPI?.setSetting(key, String(val))
   }
 
+  const parseCSV = (text) => {
+    const rows = []
+    let row = []
+    let cell = ''
+    let inQuotes = false
+
+    for (let i = 0; i < text.length; i++) {
+      const c = text[i]
+      if (inQuotes) {
+        if (c === '"') {
+          if (text[i + 1] === '"') {
+            cell += '"'
+            i++
+          } else {
+            inQuotes = false
+          }
+        } else {
+          cell += c
+        }
+      } else if (c === '"') {
+        inQuotes = true
+      } else if (c === ',') {
+        row.push(cell)
+        cell = ''
+      } else if (c === '\n' || c === '\r') {
+        if (c === '\r' && text[i + 1] === '\n') i++
+        row.push(cell)
+        cell = ''
+        if (row.some((x) => x.trim() !== '')) rows.push(row)
+        row = []
+      } else {
+        cell += c
+      }
+    }
+    row.push(cell)
+    if (row.some((x) => x.trim() !== '')) rows.push(row)
+
+    const header = rows[0].map((h) => h.trim().toLowerCase())
+    const data = rows.slice(1)
+
+    return data.map((r) => {
+      const obj = {}
+      header.forEach((h, idx) => { obj[h] = (r[idx] || '').trim() })
+      return obj
+    })
+  }
+
+  const csvToSoal = (records) => {
+    return records
+      .filter((r) => r.question)
+      .map((r, i) => {
+        const type = (r.type || 'isian').trim().toLowerCase().replace(/[-\s]+/g, '_')
+        let normalizedType = 'isian'
+        if (type === 'pilihan_ganda' || type === 'pg' || type === 'multiple_choice') normalizedType = 'pilihan_ganda'
+        else if (type === 'benar_salah' || type === 'true_false' || type === 'bs') normalizedType = 'benar_salah'
+
+        const options = []
+        if (normalizedType === 'pilihan_ganda') {
+          for (const key of ['option_a', 'option_b', 'option_c', 'option_d', 'a', 'b', 'c', 'd']) {
+            const val = r[key]
+            if (val) options.push(val)
+            if (options.length === 4) break
+          }
+        }
+
+        return {
+          id: 'soal-' + Date.now() + '-' + i,
+          type: normalizedType,
+          question: r.question,
+          options: options.length > 0 ? options : undefined,
+          answer: r.answer || ''
+        }
+      })
+  }
+
+  const handleSoalFile = async (e) => {
+    const file = e.target.files[0]
+    if (!file) return
+    e.target.value = ''
+
+    try {
+      const text = await file.text()
+      let parsed = []
+
+      if (file.name.toLowerCase().endsWith('.csv')) {
+        const records = parseCSV(text)
+        parsed = csvToSoal(records)
+      } else {
+        const json = JSON.parse(text)
+        const arr = Array.isArray(json) ? json : (json.soal || [])
+        parsed = arr.map((s, i) => ({
+          id: 'soal-' + Date.now() + '-' + i,
+          type: (s.type || 'isian').toString().toLowerCase().replace(/[-\s]+/g, '_'),
+          question: s.question || '',
+          options: Array.isArray(s.options) ? s.options : undefined,
+          answer: s.answer || ''
+        }))
+      }
+
+      const valid = parsed.filter((s) => s.question)
+      if (valid.length === 0) {
+        setNotification('File tidak berisi soal yang valid')
+        return
+      }
+      setSoalList(valid)
+      setActiveSoalId(null)
+      electronAPI?.hideQuestion()
+      setNotification('Loaded ' + valid.length + ' soal')
+    } catch (err) {
+      setNotification('Gagal membaca file: ' + err.message)
+    }
+  }
+
+  const toggleSoal = (soal) => {
+    if (activeSoalId === soal.id) {
+      setActiveSoalId(null)
+      electronAPI?.hideQuestion()
+    } else {
+      setActiveSoalId(soal.id)
+      electronAPI?.showQuestion(soal)
+    }
+  }
+
+  const handleExportPng = async () => {
+    setExporting(true)
+    try {
+      const result = await electronAPI?.exportDisplayPng()
+      if (result && !result.canceled) {
+        setNotification('Gambar tersimpan: ' + (result.filePath || '').split(/[\\/]/).pop())
+      } else if (result && result.canceled && !result.error) {
+        setNotification('Export dibatalkan')
+      } else if (result && result.error) {
+        setNotification('Gagal export: ' + result.error)
+      }
+    } catch (err) {
+      setNotification('Gagal export: ' + err.message)
+    } finally {
+      setExporting(false)
+    }
+  }
+
   return (
     <div className="p-4 max-w-3xl mx-auto">
       {isLoading && <div className="text-center py-4 text-gray-500">Memuat...</div>}
@@ -509,6 +901,28 @@ function Control() {
 
       <h1 className="text-2xl font-bold text-center mb-4">CONTROL PANEL</h1>
 
+      <div className="flex gap-1 bg-gray-100 rounded-lg p-1 mb-4">
+        {[
+          { id: 'operator', label: 'Operator' },
+          { id: 'soal', label: 'Soal' },
+          { id: 'tampilan', label: 'Tampilan' },
+          { id: 'histori', label: 'Histori' },
+        ].map((tab) => (
+          <button
+            key={tab.id}
+            onClick={() => setActiveTab(tab.id)}
+            className={`flex-1 px-4 py-2 text-sm font-semibold rounded-md transition-colors ${
+              activeTab === tab.id
+                ? 'bg-blue-600 text-white shadow'
+                : 'text-gray-600 hover:bg-white'
+            }`}
+          >
+            {tab.label}
+          </button>
+        ))}
+      </div>
+
+      {activeTab === 'operator' && (<>
       {/* CARD: TIM */}
       <div className="bg-white border rounded-lg shadow-sm p-4 mb-4">
         <h2 className="font-bold text-lg mb-3">TIM</h2>
@@ -606,12 +1020,65 @@ function Control() {
           <button onClick={() => electronAPI?.resetTimer()} className="bg-gray-500 text-white px-3 py-1.5 text-sm font-semibold rounded">Reset</button>
         </div>
       </div>
+      </>)}
 
-      {/* CARD: DATA */}
+      {activeTab === 'soal' && (
       <div className="bg-white border rounded-lg shadow-sm p-4 mb-4">
         <div className="flex items-center justify-between mb-3">
+          <h2 className="font-bold text-lg">SOAL</h2>
+          <input
+            type="file"
+            accept=".json,.csv"
+            onChange={handleSoalFile}
+            className="border p-2 text-sm"
+          />
+        </div>
+        <p className="text-xs text-gray-500 mb-3">
+          Format: JSON ({'{'} "soal": [ ... ] {'}'}) atau CSV (type, question, option_a..option_d, answer). Tipe: pilihan_ganda, isian, benar_salah.
+        </p>
+        {soalList.length === 0 && (
+          <p className="text-xs text-gray-400 italic">Belum ada soal. Upload file .json atau .csv.</p>
+        )}
+        <ul className="space-y-1">
+          {soalList.map((soal, i) => (
+            <li key={soal.id} className="flex items-center justify-between bg-gray-50 px-3 py-2 rounded text-sm gap-2">
+              <div className="min-w-0 flex-1">
+                <span className="text-xs text-gray-400 font-semibold uppercase mr-2">
+                  {soal.type === 'pilihan_ganda' ? 'PG' : soal.type === 'benar_salah' ? 'B/S' : 'Isian'}
+                </span>
+                <span className="font-medium truncate">{i + 1}. {soal.question}</span>
+              </div>
+              <button
+                onClick={() => toggleSoal(soal)}
+                className={`px-3 py-1 text-xs font-semibold rounded shrink-0 ${
+                  activeSoalId === soal.id
+                    ? 'bg-red-500 text-white'
+                    : 'bg-blue-500 text-white'
+                }`}
+              >
+                {activeSoalId === soal.id ? 'Tutup' : 'Tampilkan'}
+              </button>
+            </li>
+          ))}
+        </ul>
+      </div>
+      )}
+
+      {activeTab === 'histori' && (<>
+      {/* CARD: DATA */}
+      <div className="bg-white border rounded-lg shadow-sm p-4 mb-4">
+        <div className="flex items-center justify-between mb-3 gap-2 flex-wrap">
           <h2 className="font-bold text-lg">DATA</h2>
-          <button onClick={() => electronAPI?.saveMatch()} className="bg-blue-500 text-white px-4 py-1.5 text-sm font-semibold rounded">Simpan</button>
+          <div className="flex gap-2">
+            <button
+              onClick={handleExportPng}
+              disabled={exporting}
+              className="bg-green-600 text-white px-4 py-1.5 text-sm font-semibold rounded disabled:opacity-50"
+            >
+              {exporting ? 'Mengekspor...' : 'Export PNG'}
+            </button>
+            <button onClick={() => electronAPI?.saveMatch()} className="bg-blue-500 text-white px-4 py-1.5 text-sm font-semibold rounded">Simpan</button>
+          </div>
         </div>
 
         <h3 className="text-sm font-semibold text-gray-600 mb-1">Load Match</h3>
@@ -639,19 +1106,14 @@ function Control() {
           })}
         </ul>
       </div>
+      </>)}
 
-      {/* CARD: TAMPILAN */}
+      {activeTab === 'tampilan' && (
+      /* CARD: TAMPILAN */
       <div className="bg-white border rounded-lg shadow-sm p-4 mb-4">
-        <button
-          onClick={() => setShowSettings(!showSettings)}
-          className="w-full text-left font-bold text-lg flex items-center justify-between"
-        >
-          <span>TAMPILAN</span>
-          <span className="text-sm font-normal text-gray-400">{showSettings ? 'Sembunyikan' : 'Tampilkan'}</span>
-        </button>
+        <h2 className="font-bold text-lg mb-3">TAMPILAN</h2>
 
-        {showSettings && (
-          <div className="mt-4 space-y-5">
+          <div className="space-y-5">
 
             {/* TEKS HEADER */}
             <div>
@@ -1124,9 +1586,218 @@ function Control() {
               </div>
             </div>
 
+            {/* POPUP SOAL */}
+            <div className="border-t pt-5">
+              <label className="block font-semibold text-sm mb-2">Pengaturan Popup Soal</label>
+              <div className="space-y-2">
+                <div className="flex items-center gap-2">
+                  <span className="w-28 text-xs">Lebar (px)</span>
+                  <input type="number" min="1" value={popupWidth}
+                    onChange={(e) => { const v = parseInt(e.target.value) || 1; setPopupWidth(v); handleSetSetting('popup_width', v) }}
+                    className="border p-1 text-xs w-20" />
+                  <span className="w-28 text-xs ml-2">Tinggi (px)</span>
+                  <input type="number" min="1" value={popupHeight}
+                    onChange={(e) => { const v = parseInt(e.target.value) || 1; setPopupHeight(v); handleSetSetting('popup_height', v) }}
+                    className="border p-1 text-xs w-20" />
+                </div>
+                <div className="flex items-center gap-2">
+                  <span className="w-28 text-xs">Ukuran Font</span>
+                  <input type="number" min="1" value={popupFontSize}
+                    onChange={(e) => { const v = parseInt(e.target.value) || 1; setPopupFontSize(v); handleSetSetting('popup_font_size', v) }}
+                    className="border p-1 text-xs w-20" />
+                </div>
+                <div className="flex items-center gap-2">
+                  <span className="w-28 text-xs">Font Kustom</span>
+                  <input type="file" accept=".ttf" onChange={async (e) => {
+                    const file = e.target.files[0]
+                    if (file) {
+                      const dataUrl = await readFileAsDataURL(file)
+                      setPopupFont(dataUrl)
+                      electronAPI?.setSetting('popup_font', dataUrl)
+                    }
+                  }} className="border p-1 text-xs flex-1" />
+                  {popupFont && (
+                    <button onClick={() => {
+                      setPopupFont('')
+                      electronAPI?.deleteSetting('popup_font')
+                    }} className="text-red-500 text-xs">Hapus</button>
+                  )}
+                </div>
+                <div className="flex items-center gap-2">
+                  <span className="w-28 text-xs">Warna Teks</span>
+                  <input type="color" value={popupTextColor}
+                    onChange={(e) => { setPopupTextColor(e.target.value); handleSetSetting('popup_text_color', e.target.value) }}
+                    className="border p-1 w-12 h-8" />
+                  <span className="w-28 text-xs ml-2">Warna Opsi</span>
+                  <input type="color" value={popupOptionColor}
+                    onChange={(e) => { setPopupOptionColor(e.target.value); handleSetSetting('popup_option_color', e.target.value) }}
+                    className="border p-1 w-12 h-8" />
+                </div>
+                <div className="flex items-center gap-2">
+                  <span className="w-28 text-xs">Bg Badge</span>
+                  <input type="color" value={popupBadgeBgColor}
+                    onChange={(e) => { setPopupBadgeBgColor(e.target.value); handleSetSetting('popup_badge_bg_color', e.target.value) }}
+                    className="border p-1 w-12 h-8" />
+                  <input type="number" min="0" max="100" value={popupBadgeOpacity}
+                    onChange={(e) => { const v = Math.min(100, Math.max(0, parseInt(e.target.value) || 0)); setPopupBadgeOpacity(v); handleSetSetting('popup_badge_opacity', v) }}
+                    className="border p-1 text-xs w-16" title="Opacity badge (%)" />
+                  <span className="w-28 text-xs ml-2">Bg Opsi</span>
+                  <input type="color" value={popupOptionBgColor}
+                    onChange={(e) => { setPopupOptionBgColor(e.target.value); handleSetSetting('popup_option_bg_color', e.target.value) }}
+                    className="border p-1 w-12 h-8" />
+                  <input type="number" min="0" max="100" value={popupOptionBgOpacity}
+                    onChange={(e) => { const v = Math.min(100, Math.max(0, parseInt(e.target.value) || 0)); setPopupOptionBgOpacity(v); handleSetSetting('popup_option_bg_opacity', v) }}
+                    className="border p-1 text-xs w-16" title="Opacity opsi (%)" />
+                </div>
+                <div className="flex items-center gap-2">
+                  <span className="w-28 text-xs">Border</span>
+                  <input type="color" value={popupBorderColor}
+                    onChange={(e) => { setPopupBorderColor(e.target.value); handleSetSetting('popup_border_color', e.target.value) }}
+                    className="border p-1 w-12 h-8" />
+                  <input type="number" min="0" value={popupBorderWidth}
+                    onChange={(e) => { const v = Math.max(0, parseInt(e.target.value) || 0); setPopupBorderWidth(v); handleSetSetting('popup_border_width', v) }}
+                    className="border p-1 text-xs w-16" title="Ketebalan border (px)" />
+                  <span className="w-28 text-xs ml-2">Shadow</span>
+                  <input type="checkbox" checked={popupShadow}
+                    onChange={(e) => { setPopupShadow(e.target.checked); handleSetSetting('popup_shadow', e.target.checked) }}
+                    className="w-4 h-4" />
+                </div>
+                <div className="flex items-center gap-2">
+                  <span className="w-28 text-xs">Font Badge</span>
+                  <input type="file" accept=".ttf" onChange={async (e) => {
+                    const file = e.target.files[0]
+                    if (file) {
+                      const dataUrl = await readFileAsDataURL(file)
+                      setPopupFontBadge(dataUrl)
+                      electronAPI?.setSetting('popup_font_badge', dataUrl)
+                    }
+                  }} className="border p-1 text-xs flex-1" />
+                  {popupFontBadge && (
+                    <button onClick={() => {
+                      setPopupFontBadge('')
+                      electronAPI?.deleteSetting('popup_font_badge')
+                    }} className="text-red-500 text-xs">Hapus</button>
+                  )}
+                </div>
+                <div className="flex items-center gap-2">
+                  <span className="w-28 text-xs">Font Soal</span>
+                  <input type="file" accept=".ttf" onChange={async (e) => {
+                    const file = e.target.files[0]
+                    if (file) {
+                      const dataUrl = await readFileAsDataURL(file)
+                      setPopupFontQuestion(dataUrl)
+                      electronAPI?.setSetting('popup_font_question', dataUrl)
+                    }
+                  }} className="border p-1 text-xs flex-1" />
+                  {popupFontQuestion && (
+                    <button onClick={() => {
+                      setPopupFontQuestion('')
+                      electronAPI?.deleteSetting('popup_font_question')
+                    }} className="text-red-500 text-xs">Hapus</button>
+                  )}
+                </div>
+                <div className="flex items-center gap-2">
+                  <span className="w-28 text-xs">Font Opsi</span>
+                  <input type="file" accept=".ttf" onChange={async (e) => {
+                    const file = e.target.files[0]
+                    if (file) {
+                      const dataUrl = await readFileAsDataURL(file)
+                      setPopupFontOption(dataUrl)
+                      electronAPI?.setSetting('popup_font_option', dataUrl)
+                    }
+                  }} className="border p-1 text-xs flex-1" />
+                  {popupFontOption && (
+                    <button onClick={() => {
+                      setPopupFontOption('')
+                      electronAPI?.deleteSetting('popup_font_option')
+                    }} className="text-red-500 text-xs">Hapus</button>
+                  )}
+                </div>
+                <div className="flex items-center gap-2">
+                  <span className="w-28 text-xs">Font Badge</span>
+                  <input type="number" min="1" value={popupBadgeFontSize}
+                    onChange={(e) => { const v = parseInt(e.target.value) || 1; setPopupBadgeFontSize(v); handleSetSetting('popup_badge_font_size', v) }}
+                    className="border p-1 text-xs w-20" />
+                  <span className="w-28 text-xs ml-2">Pad X</span>
+                  <input type="number" min="0" value={popupBadgeBgPaddingX}
+                    onChange={(e) => { const v = Math.max(0, parseInt(e.target.value) || 0); setPopupBadgeBgPaddingX(v); handleSetSetting('popup_badge_bg_padding_x', v) }}
+                    className="border p-1 text-xs w-20" />
+                  <span className="w-28 text-xs ml-2">Pad Y</span>
+                  <input type="number" min="0" value={popupBadgeBgPaddingY}
+                    onChange={(e) => { const v = Math.max(0, parseInt(e.target.value) || 0); setPopupBadgeBgPaddingY(v); handleSetSetting('popup_badge_bg_padding_y', v) }}
+                    className="border p-1 text-xs w-20" />
+                </div>
+                <div className="flex items-center gap-2">
+                  <span className="w-28 text-xs">Posisi Badge X</span>
+                  <input type="number" value={popupBadgePosX}
+                    onChange={(e) => { const v = parseInt(e.target.value) || 0; setPopupBadgePosX(v); handleSetSetting('popup_badge_pos_x', v) }}
+                    className="border p-1 text-xs w-20" />
+                  <span className="w-28 text-xs ml-2">Posisi Badge Y</span>
+                  <input type="number" value={popupBadgePosY}
+                    onChange={(e) => { const v = parseInt(e.target.value) || 0; setPopupBadgePosY(v); handleSetSetting('popup_badge_pos_y', v) }}
+                    className="border p-1 text-xs w-20" />
+                </div>
+                <div className="flex items-center gap-2">
+                  <span className="w-28 text-xs">Font Opsi</span>
+                  <input type="number" min="1" value={popupOptionFontSize}
+                    onChange={(e) => { const v = parseInt(e.target.value) || 1; setPopupOptionFontSize(v); handleSetSetting('popup_option_font_size', v) }}
+                    className="border p-1 text-xs w-20" />
+                  <span className="w-28 text-xs ml-2">Pad X</span>
+                  <input type="number" min="0" value={popupOptionBgPaddingX}
+                    onChange={(e) => { const v = Math.max(0, parseInt(e.target.value) || 0); setPopupOptionBgPaddingX(v); handleSetSetting('popup_option_bg_padding_x', v) }}
+                    className="border p-1 text-xs w-20" />
+                  <span className="w-28 text-xs ml-2">Pad Y</span>
+                  <input type="number" min="0" value={popupOptionBgPaddingY}
+                    onChange={(e) => { const v = Math.max(0, parseInt(e.target.value) || 0); setPopupOptionBgPaddingY(v); handleSetSetting('popup_option_bg_padding_y', v) }}
+                    className="border p-1 text-xs w-20" />
+                </div>
+                <div className="flex items-center gap-2">
+                  <span className="w-28 text-xs">Posisi Opsi X</span>
+                  <input type="number" value={popupOptionPosX}
+                    onChange={(e) => { const v = parseInt(e.target.value) || 0; setPopupOptionPosX(v); handleSetSetting('popup_option_pos_x', v) }}
+                    className="border p-1 text-xs w-20" />
+                  <span className="w-28 text-xs ml-2">Posisi Opsi Y</span>
+                  <input type="number" value={popupOptionPosY}
+                    onChange={(e) => { const v = parseInt(e.target.value) || 0; setPopupOptionPosY(v); handleSetSetting('popup_option_pos_y', v) }}
+                    className="border p-1 text-xs w-20" />
+                </div>
+                <div>
+                  <label className="block text-xs font-semibold text-gray-500 mb-1">Background Warna Solid</label>
+                  <input type="color" value={popupBgColor}
+                    onChange={(e) => { setPopupBgColor(e.target.value); handleSetSetting('popup_bg_color', e.target.value) }}
+                    className="border p-1 w-full h-9" />
+                </div>
+                <div>
+                  <label className="block text-xs font-semibold text-gray-500 mb-1">Background Gambar</label>
+                  <div className="flex gap-2">
+                    <input
+                      type="file"
+                      accept="image/*"
+                      onChange={async (e) => {
+                        const file = e.target.files[0]
+                        if (file) {
+                          const dataUrl = await readFileAsDataURL(file)
+                          setPopupBgImage(dataUrl)
+                          electronAPI?.setSetting('popup_bg_image', dataUrl)
+                        }
+                      }}
+                      className="border p-2 text-sm flex-1"
+                    />
+                    {popupBgImage && (
+                      <button onClick={() => {
+                        setPopupBgImage('')
+                        electronAPI?.deleteSetting('popup_bg_image')
+                      }} className="bg-red-500 text-white px-2 py-1 text-sm rounded">Hapus</button>
+                    )}
+                  </div>
+                  {popupBgImage && <img src={popupBgImage} className="h-12 mt-1 object-contain" alt="preview" />}
+                </div>
+              </div>
+            </div>
+
           </div>
-        )}
       </div>
+      )}
 
       </>)}
     </div>

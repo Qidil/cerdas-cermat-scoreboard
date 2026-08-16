@@ -1,4 +1,4 @@
-const { app, BrowserWindow, ipcMain } = require('electron')
+const { app, BrowserWindow, ipcMain, dialog } = require('electron')
 const path = require('path')
 const db = require(path.join(__dirname, 'database.js'))
 const fs = require('fs')
@@ -410,5 +410,42 @@ ipcMain.on('reset-timer', () => {
   if (displayWindow) {
     displayWindow.webContents.send('timer-update', currentTime)
     displayWindow.webContents.send('timer-visibility', false)
+  }
+})
+
+// soal
+ipcMain.on('show-question', (event, soal) => {
+  if (displayWindow && soal) {
+    const { answer, ...safeSoal } = soal
+    displayWindow.webContents.send('show-question', safeSoal)
+  }
+})
+
+ipcMain.on('hide-question', () => {
+  if (displayWindow) {
+    displayWindow.webContents.send('hide-question')
+  }
+})
+
+ipcMain.handle('export-display-png', async () => {
+  if (!displayWindow) return { canceled: true }
+
+  try {
+    const image = await displayWindow.webContents.capturePage()
+    const { canceled, filePath } = await dialog.showSaveDialog(displayWindow, {
+      title: 'Simpan Gambar Display',
+      defaultPath: 'display-' + Date.now() + '.png',
+      filters: [
+        { name: 'PNG Image', extensions: ['png'] }
+      ]
+    })
+
+    if (canceled || !filePath) return { canceled: true }
+
+    fs.writeFileSync(filePath, image.toPNG())
+    return { canceled: false, filePath }
+  } catch (err) {
+    console.error('Error exporting display PNG:', err.message)
+    return { canceled: true, error: err.message }
   }
 })

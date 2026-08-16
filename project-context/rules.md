@@ -39,6 +39,17 @@
 | `react-hooks/exhaustive-deps` | `warn` (recommended) | Dari `reactHooks.configs.flat.recommended` |
 | `react-refresh/only-export-components` | `warn` | Dari `reactRefresh.configs.vite` |
 
+## Proses Kerja — Konfirmasi
+
+| Aturan | Deskripsi |
+|---|---|
+| P-001 | Setelah selesai satu **phase**, jalankan **kedua gate berurutan** (spec-compliance → code-review) secara otomatis, tanpa konfirmasi per gate |
+| P-002 | Perbaiki temuan gate langsung (BLOCKER/MAJOR di-fix, MINOR/INFO ditangani) lalu re-run gate, tanpa konfirmasi per temuan |
+| P-003 | Jangan pernah **commit** atau **push ke GitHub** tanpa konfirmasi user terlebih dahulu |
+| P-004 | Konfirmasi user hanya wajib untuk **commit/push**; setelah itu tunggu jawaban "ya/setuju" sebelum lanjut |
+
+> Alasan: user ingin gate berjalan otomatis dan berurutan setelah setiap fase selesai, tanpa jeda konfirmasi per gate; kontrol penuh hanya dipegang pada titik commit/push ke remote.
+
 ## `[FORBIDDEN]` — Larangan Teknis
 
 | Kode | Larangan | Alasan | Sanksi |

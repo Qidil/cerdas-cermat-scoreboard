@@ -43,4 +43,15 @@ contextBridge.exposeInMainWorld('electronAPI', {
         ipcRenderer.on('settings-updated', (e, data) => callback(data)),
     onOperationError: (callback) =>
         ipcRenderer.on('operation-error', (e, data) => callback(data)),
+
+    //soal
+    showQuestion: (soal) => ipcRenderer.send('show-question', soal),
+    hideQuestion: () => ipcRenderer.send('hide-question'),
+    onShowQuestion: (callback) =>
+        ipcRenderer.on('show-question', (e, data) => callback(data)),
+    onHideQuestion: (callback) =>
+        ipcRenderer.on('hide-question', () => callback()),
+
+    //export
+    exportDisplayPng: () => ipcRenderer.invoke('export-display-png'),
 })

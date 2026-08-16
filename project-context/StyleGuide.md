@@ -93,6 +93,73 @@ Semua ukuran font bisa diatur via input number (min=1, tanpa batas atas). Semua 
 
 Card TAMPILAN bersifat collapsible agar tidak memakan ruang saat tidak digunakan.
 
+### Control Page (`/control`) — Tab-based Layout (Fase 5)
+```
+┌─────────────────────────────────────────┐
+│  CONTROL PANEL                          │
+│                                         │
+│  [Operator] [Soal] [Tampilan] [Histori] │  ← tab menu (atas)
+│  ┌───────────────────────────────────┐  │
+│  │  Konten tab aktif (hanya satu)    │  │
+│  └───────────────────────────────────┘  │
+└─────────────────────────────────────────┘
+```
+
+| Tab | Isi |
+|---|---|
+| **Operator** | Card TIM, SKOR, TIMER (seperti layout card-based lama) |
+| **Soal** | Upload .json/.csv, daftar soal, klik soal = toggle popup di Display |
+| **Tampilan** | Semua pengaturan tampilan Display + pengaturan popup soal |
+| **Histori** | History, save/load match, export PNG |
+
+### Popup Soal di Display
+```
+┌─────────────── layar Display ───────────────┐
+│                                              │
+│            (background tetap tampil)         │
+│   ┌───────────────────────────────┐         │
+│   │    Pertanyaan (teks besar)    │  ← popup│
+│   │                               │   (w/h  │
+│   │   A. opsi   B. opsi          │    dari │
+│   │   C. opsi   D. opsi          │    setting)│
+│   └───────────────────────────────┘         │
+│                                              │
+└──────────────────────────────────────────────┘
+```
+
+| Setting Popup | Default | Keterangan |
+|---|---|---|
+| `popup_width` | 900px | Lebar popup |
+| `popup_height` | 500px | Tinggi popup |
+| `popup_bg_color` | `#1e293b` | Background solid |
+| `popup_bg_image` | — | Background gambar (data URL) |
+| `popup_font` | — | Font .ttf custom |
+| `popup_font_size` | 36px | Ukuran teks soal |
+| `popup_text_color` | `#ffffff` | Warna teks soal |
+| `popup_option_color` | `#94a3b8` | Warna opsi jawaban |
+| `popup_badge_bg_color` | `#ffffff` | Background badge tipe soal (opacity 15%) |
+| `popup_badge_opacity` | 15% | Opacity background badge tipe soal |
+| `popup_option_bg_color` | `#ffffff` | Background opsi jawaban (opacity 10%) |
+| `popup_option_bg_opacity` | 10% | Opacity background opsi jawaban |
+| `popup_border_color` | `#ffffff` | Warna border popup |
+| `popup_border_width` | 0px | Ketebalan border popup |
+| `popup_shadow` | on | Tampilkan/sembunyikan shadow popup |
+| `popup_font_badge` | — | Font .ttf badge tipe soal (fallback: `popup_font`) |
+| `popup_font_question` | — | Font .ttf teks soal (fallback: `popup_font`) |
+| `popup_font_option` | — | Font .ttf teks opsi (fallback: `popup_font`) |
+| `popup_badge_font_size` | 14px | Ukuran font badge |
+| `popup_badge_bg_padding_x` | 12px | Padding horizontal background badge |
+| `popup_badge_bg_padding_y` | 4px | Padding vertikal background badge |
+| `popup_badge_pos_x` | 0px | Offset X posisi badge |
+| `popup_badge_pos_y` | 0px | Offset Y posisi badge |
+| `popup_option_font_size` | 20px | Ukuran font opsi |
+| `popup_option_bg_padding_x` | 24px | Padding horizontal background opsi |
+| `popup_option_bg_padding_y` | 12px | Padding vertikal background opsi |
+| `popup_option_pos_x` | 0px | Offset X posisi opsi |
+| `popup_option_pos_y` | 0px | Offset Y posisi opsi |
+
+Popup ditampilkan di tengah layar Display, di atas background yang tetap terlihat.
+
 ## Animasi
 
 | Nama | Durasi | Elemen | Efek |
@@ -101,6 +168,8 @@ Card TAMPILAN bersifat collapsible agar tidak memakan ruang saat tidak digunakan
 | `fade-zoom` | 0.6s | (tidak digunakan di kode saat ini) | Scale dari 0.5 ke 1 |
 | `timer-pulse` | infinite | Timer (saat aktif) | Scale 1 → 1.1 → 1 (berulang) |
 | `flicker` | 0.3s (3x) | Feedback overlay | Opacity 1 → 0 → 1 (3 kali) |
+| `popup-in` | 0.25s | Popup soal (muncul) | Fade in + scale 0.9 → 1 |
+| `popup-out` | 0.2s | Popup soal (tutup) | Fade out + scale 1 → 0.9 |
 
 ## Suara
 
