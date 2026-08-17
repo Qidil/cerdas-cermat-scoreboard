@@ -1092,6 +1092,13 @@ function Control() {
           {files.length === 0 && <li className="text-xs text-gray-400 italic">Belum ada backup</li>}
         </ul>
 
+        <button
+          onClick={() => electronAPI?.openDataDir()}
+          className="bg-purple-600 text-white px-4 py-1.5 text-sm font-semibold rounded mb-3"
+        >
+          Buka Lokasi Data
+        </button>
+
         <h3 className="text-sm font-semibold text-gray-600 mb-1">History</h3>
         <ul className="space-y-0.5 max-h-32 overflow-y-auto">
           {history.map((item) => {

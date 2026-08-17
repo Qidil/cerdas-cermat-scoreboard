@@ -54,4 +54,8 @@ contextBridge.exposeInMainWorld('electronAPI', {
 
     //export
     exportDisplayPng: () => ipcRenderer.invoke('export-display-png'),
+
+    //data dir
+    getDataDir: () => ipcRenderer.invoke('get-data-dir'),
+    openDataDir: () => ipcRenderer.send('open-data-dir'),
 })

@@ -1,4 +1,4 @@
-const { app, BrowserWindow, ipcMain, dialog } = require('electron')
+const { app, BrowserWindow, ipcMain, dialog, shell } = require('electron')
 const path = require('path')
 const db = require(path.join(__dirname, 'database.js'))
 const fs = require('fs')
@@ -448,4 +448,12 @@ ipcMain.handle('export-display-png', async () => {
     console.error('Error exporting display PNG:', err.message)
     return { canceled: true, error: err.message }
   }
+})
+
+ipcMain.handle('get-data-dir', () => {
+  return getDataDir()
+})
+
+ipcMain.on('open-data-dir', () => {
+  shell.openPath(getDataDir())
 })
