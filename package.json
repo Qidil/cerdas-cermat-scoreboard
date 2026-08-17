@@ -7,7 +7,7 @@
     "electron": "electron .",
     "start": "concurrently \"npm run dev\" \"npm run electron\"",
     "build:vite": "cd frontend && npm run build",
-    "build:exe": "npm run build:vite && electron-packager . \"Cerdas Cermat Scoreboard v3\" --platform=win32 --arch=x64 --out=release --overwrite --icon=frontend/public/favicon.ico --prune=true --ignore=\"frontend/node_modules\" --ignore=\"frontend/src\" --ignore=\"frontend/*\" --ignore=\"backups\" --ignore=\"project-context\" --ignore=\".opencode\" --ignore=\".agents\" --ignore=\"score.db\" --ignore=\".codebase-memory\" --ignore=\"contoh-soal\" --ignore=\"screenshot\" --ignore=\"skills-lock.json\" --ignore=\".gitattributes\" --ignore=\".gitignore\" --ignore=\"README.md\""
+    "build:exe": "npm run build:vite && electron-packager . \"Cerdas Cermat Scoreboard v4\" --platform=win32 --arch=x64 --out=release --overwrite --icon=frontend/public/favicon.ico --prune=true --ignore=\"frontend/node_modules\" --ignore=\"frontend/src\" --ignore=\"frontend/package.json\" --ignore=\"frontend/vite.config.js\" --ignore=\"frontend/eslint.config.js\" --ignore=\"frontend/tailwind.config.js\" --ignore=\"frontend/postcss.config.js\" --ignore=\"frontend/index.html\" --ignore=\"frontend/README.md\" --ignore=\"frontend/.gitignore\" --ignore=\"backups\" --ignore=\"project-context\" --ignore=\".opencode\" --ignore=\".agents\" --ignore=\"score.db\" --ignore=\".codebase-memory\" --ignore=\"contoh-soal\" --ignore=\"screenshot\" --ignore=\"skills-lock.json\" --ignore=\".gitattributes\" --ignore=\".gitignore\" --ignore=\"README.md\""
   },
   "devDependencies": {
     "concurrently": "^9.2.1",
