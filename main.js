@@ -30,8 +30,8 @@ function createWindow() {
   })
 
   controlWindow = new BrowserWindow({
-    width: 800,
-    height: 600,
+    width: 1100,
+    height: 680,
     icon: iconPath,
     webPreferences: {
       preload: path.join(__dirname, 'preload.js')

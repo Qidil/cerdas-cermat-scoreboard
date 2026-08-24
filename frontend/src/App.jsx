@@ -538,7 +538,7 @@ function Control() {
   const [textColorScore, setTextColorScore] = useState('#ffffff')
   const [textColorTimer, setTextColorTimer] = useState('#ffffff')
   const [textColorFooter, setTextColorFooter] = useState('#ffffff')
-  const [activeTab, setActiveTab] = useState('operator')
+  const [activeTab, setActiveTab] = useState('soal')
   const [soalList, setSoalList] = useState([])
   const [activeSoalId, setActiveSoalId] = useState(null)
   const [popupWidth, setPopupWidth] = useState(900)
@@ -890,137 +890,140 @@ function Control() {
   }
 
   return (
-    <div className="p-4 max-w-3xl mx-auto">
-      {isLoading && <div className="text-center py-4 text-gray-500">Memuat...</div>}
-      {!isLoading && (<>
-      {notification && (
-        <div className="fixed top-4 right-4 bg-blue-600 text-white px-4 py-2 rounded shadow-lg z-50 text-sm">
-          {notification}
-        </div>
-      )}
+      <div className="p-4">
+        {isLoading && <div className="text-center py-4 text-gray-500">Memuat...</div>}
+        {!isLoading && (<>
+        {notification && (
+          <div className="fixed top-4 right-4 bg-blue-600 text-white px-4 py-2 rounded shadow-lg z-50 text-sm">
+            {notification}
+          </div>
+        )}
 
-      <h1 className="text-2xl font-bold text-center mb-4">CONTROL PANEL</h1>
+        <h1 className="text-2xl font-bold text-center mb-4">CONTROL PANEL</h1>
 
-      <div className="flex gap-1 bg-gray-100 rounded-lg p-1 mb-4">
-        {[
-          { id: 'operator', label: 'Operator' },
-          { id: 'soal', label: 'Soal' },
-          { id: 'tampilan', label: 'Tampilan' },
-          { id: 'histori', label: 'Histori' },
-        ].map((tab) => (
-          <button
-            key={tab.id}
-            onClick={() => setActiveTab(tab.id)}
-            className={`flex-1 px-4 py-2 text-sm font-semibold rounded-md transition-colors ${
-              activeTab === tab.id
-                ? 'bg-blue-600 text-white shadow'
-                : 'text-gray-600 hover:bg-white'
-            }`}
-          >
-            {tab.label}
-          </button>
-        ))}
+        <div className="flex gap-4 items-start">
+          {/* KOLOM KIRI: OPERATOR (selalu tampil) */}
+          <div className="w-[440px] shrink-0 overflow-y-auto max-h-[calc(100vh-7rem)]">
+
+          {/* CARD: TIM */}
+          <div className="bg-white border rounded-lg shadow-sm p-4 mb-4">
+            <h2 className="font-bold text-lg mb-3">TIM</h2>
+            <div className="flex gap-2 mb-3">
+              <input
+                type="text"
+                placeholder="Nama Tim"
+                value={teamName}
+                onChange={(e) => setTeamName(e.target.value)}
+                className="border p-2 flex-1 text-sm"
+              />
+              <button onClick={handleAddTeam} className="bg-blue-500 text-white px-4 py-2 text-sm font-semibold">
+                Tambah
+              </button>
+            </div>
+            <ul className="space-y-1">
+              {teams.map((team) => (
+                <li key={team.id} className="flex items-center justify-between bg-gray-50 px-3 py-2 rounded text-sm">
+                  <span className="font-medium">{team.name} — <span className="font-bold">{team.score}</span></span>
+                  {confirmDelete === team.id ? (
+                    <span className="flex gap-1">
+                      <button onClick={() => {
+                        electronAPI?.deleteTeam(team.id)
+                        setConfirmDelete(null)
+                      }} className="text-red-600 font-bold text-xs px-2 py-1 border border-red-300 rounded">Yakin?</button>
+                      <button onClick={() => setConfirmDelete(null)} className="text-gray-500 text-xs px-2 py-1 border rounded">Batal</button>
+                    </span>
+                  ) : (
+                    <button onClick={() => setConfirmDelete(team.id)} className="text-red-500 text-lg leading-none hover:bg-red-50 px-2 rounded" title="Hapus tim">&times;</button>
+                  )}
+                </li>
+              ))}
+            </ul>
+          </div>
+
+          {/* CARD: SKOR */}
+          <div className="bg-white border rounded-lg shadow-sm p-4 mb-4">
+            <h2 className="font-bold text-lg mb-3">SKOR</h2>
+            <div className="flex gap-2 mb-3">
+              <button
+                onClick={() => electronAPI?.sendFeedback('correct')}
+                className="flex items-center gap-1 bg-green-500 text-white px-4 py-2 rounded text-sm font-semibold"
+              >
+                <svg viewBox="0 0 24 24" className="w-4 h-4" fill="none" stroke="white" strokeWidth="4" strokeLinecap="round"><path d="M5 13l4 4L19 7"/></svg>
+                BENAR
+              </button>
+              <button
+                onClick={() => electronAPI?.sendFeedback('wrong')}
+                className="flex items-center gap-1 bg-red-500 text-white px-4 py-2 rounded text-sm font-semibold"
+              >
+                <svg viewBox="0 0 24 24" className="w-4 h-4" fill="none" stroke="white" strokeWidth="4" strokeLinecap="round"><path d="M6 6l12 12"/><path d="M18 6l-12 12"/></svg>
+                SALAH
+              </button>
+            </div>
+            <div className="flex flex-wrap gap-2 items-center">
+              <select
+                onChange={(e) => setSelectedTeam(parseInt(e.target.value))}
+                className="border p-2 text-sm flex-1 min-w-[120px]"
+              >
+                <option value="">Pilih Tim</option>
+                {teams.map((team) => (
+                  <option key={team.id} value={team.id}>
+                    {team.name}
+                  </option>
+                ))}
+              </select>
+              <input
+                type="number"
+                placeholder="Skor"
+                value={value}
+                onChange={(e) => setValue(e.target.value)}
+                className="border p-2 text-sm w-20"
+              />
+              <button onClick={handleAddScore} className="bg-green-600 text-white px-3 py-2 text-sm font-semibold rounded">+ Tambah</button>
+              <button onClick={handleMinusScore} className="bg-red-600 text-white px-3 py-2 text-sm font-semibold rounded">- Kurang</button>
+            </div>
+          </div>
+
+          {/* CARD: TIMER */}
+          <div className="bg-white border rounded-lg shadow-sm p-4 mb-4">
+            <h2 className="font-bold text-lg mb-3">TIMER</h2>
+            <div className="flex gap-2 mb-3">
+              <input
+                type="number"
+                placeholder="Detik"
+                value={timeInput}
+                onChange={(e) => setTimeInput(e.target.value)}
+                className="border p-2 text-sm w-24"
+              />
+            </div>
+            <div className="flex flex-wrap gap-2">
+              <button onClick={() => electronAPI?.startTimer(Number(timeInput))} className="bg-blue-500 text-white px-3 py-1.5 text-sm font-semibold rounded">Start</button>
+              <button onClick={() => electronAPI?.pauseTimer()} className="bg-yellow-500 text-white px-3 py-1.5 text-sm font-semibold rounded">Pause</button>
+              <button onClick={() => electronAPI?.resumeTimer()} className="bg-green-500 text-white px-3 py-1.5 text-sm font-semibold rounded">Resume</button>
+              <button onClick={() => electronAPI?.resetTimer()} className="bg-gray-500 text-white px-3 py-1.5 text-sm font-semibold rounded">Reset</button>
+            </div>
+          </div>
       </div>
-
-      {activeTab === 'operator' && (<>
-      {/* CARD: TIM */}
-      <div className="bg-white border rounded-lg shadow-sm p-4 mb-4">
-        <h2 className="font-bold text-lg mb-3">TIM</h2>
-        <div className="flex gap-2 mb-3">
-          <input
-            type="text"
-            placeholder="Nama Tim"
-            value={teamName}
-            onChange={(e) => setTeamName(e.target.value)}
-            className="border p-2 flex-1 text-sm"
-          />
-          <button onClick={handleAddTeam} className="bg-blue-500 text-white px-4 py-2 text-sm font-semibold">
-            Tambah
-          </button>
-        </div>
-        <ul className="space-y-1">
-          {teams.map((team) => (
-            <li key={team.id} className="flex items-center justify-between bg-gray-50 px-3 py-2 rounded text-sm">
-              <span className="font-medium">{team.name} — <span className="font-bold">{team.score}</span></span>
-              {confirmDelete === team.id ? (
-                <span className="flex gap-1">
-                  <button onClick={() => {
-                    electronAPI?.deleteTeam(team.id)
-                    setConfirmDelete(null)
-                  }} className="text-red-600 font-bold text-xs px-2 py-1 border border-red-300 rounded">Yakin?</button>
-                  <button onClick={() => setConfirmDelete(null)} className="text-gray-500 text-xs px-2 py-1 border rounded">Batal</button>
-                </span>
-              ) : (
-                <button onClick={() => setConfirmDelete(team.id)} className="text-red-500 text-lg leading-none hover:bg-red-50 px-2 rounded" title="Hapus tim">&times;</button>
-              )}
-            </li>
+      {/* KOLOM KANAN: tab Soal / Tampilan / Histori */}
+      <div className="flex-1 min-w-0 overflow-y-auto max-h-[calc(100vh-7rem)]">
+        <div className="flex gap-1 bg-gray-100 rounded-lg p-1 mb-4">
+          {[
+            { id: 'soal', label: 'Soal' },
+            { id: 'tampilan', label: 'Tampilan' },
+            { id: 'histori', label: 'Histori' },
+          ].map((tab) => (
+            <button
+              key={tab.id}
+              onClick={() => setActiveTab(tab.id)}
+              className={`flex-1 px-4 py-2 text-sm font-semibold rounded-md transition-colors ${
+                activeTab === tab.id
+                  ? 'bg-blue-600 text-white shadow'
+                  : 'text-gray-600 hover:bg-white'
+              }`}
+            >
+              {tab.label}
+            </button>
           ))}
-        </ul>
-      </div>
-
-      {/* CARD: SKOR */}
-      <div className="bg-white border rounded-lg shadow-sm p-4 mb-4">
-        <h2 className="font-bold text-lg mb-3">SKOR</h2>
-        <div className="flex gap-2 mb-3">
-          <button
-            onClick={() => electronAPI?.sendFeedback('correct')}
-            className="flex items-center gap-1 bg-green-500 text-white px-4 py-2 rounded text-sm font-semibold"
-          >
-            <svg viewBox="0 0 24 24" className="w-4 h-4" fill="none" stroke="white" strokeWidth="4" strokeLinecap="round"><path d="M5 13l4 4L19 7"/></svg>
-            BENAR
-          </button>
-          <button
-            onClick={() => electronAPI?.sendFeedback('wrong')}
-            className="flex items-center gap-1 bg-red-500 text-white px-4 py-2 rounded text-sm font-semibold"
-          >
-            <svg viewBox="0 0 24 24" className="w-4 h-4" fill="none" stroke="white" strokeWidth="4" strokeLinecap="round"><path d="M6 6l12 12"/><path d="M18 6l-12 12"/></svg>
-            SALAH
-          </button>
         </div>
-        <div className="flex flex-wrap gap-2 items-center">
-          <select
-            onChange={(e) => setSelectedTeam(parseInt(e.target.value))}
-            className="border p-2 text-sm flex-1 min-w-[120px]"
-          >
-            <option value="">Pilih Tim</option>
-            {teams.map((team) => (
-              <option key={team.id} value={team.id}>
-                {team.name}
-              </option>
-            ))}
-          </select>
-          <input
-            type="number"
-            placeholder="Skor"
-            value={value}
-            onChange={(e) => setValue(e.target.value)}
-            className="border p-2 text-sm w-20"
-          />
-          <button onClick={handleAddScore} className="bg-green-600 text-white px-3 py-2 text-sm font-semibold rounded">+ Tambah</button>
-          <button onClick={handleMinusScore} className="bg-red-600 text-white px-3 py-2 text-sm font-semibold rounded">- Kurang</button>
-        </div>
-      </div>
-
-      {/* CARD: TIMER */}
-      <div className="bg-white border rounded-lg shadow-sm p-4 mb-4">
-        <h2 className="font-bold text-lg mb-3">TIMER</h2>
-        <div className="flex gap-2 mb-3">
-          <input
-            type="number"
-            placeholder="Detik"
-            value={timeInput}
-            onChange={(e) => setTimeInput(e.target.value)}
-            className="border p-2 text-sm w-24"
-          />
-        </div>
-        <div className="flex flex-wrap gap-2">
-          <button onClick={() => electronAPI?.startTimer(Number(timeInput))} className="bg-blue-500 text-white px-3 py-1.5 text-sm font-semibold rounded">Start</button>
-          <button onClick={() => electronAPI?.pauseTimer()} className="bg-yellow-500 text-white px-3 py-1.5 text-sm font-semibold rounded">Pause</button>
-          <button onClick={() => electronAPI?.resumeTimer()} className="bg-green-500 text-white px-3 py-1.5 text-sm font-semibold rounded">Resume</button>
-          <button onClick={() => electronAPI?.resetTimer()} className="bg-gray-500 text-white px-3 py-1.5 text-sm font-semibold rounded">Reset</button>
-        </div>
-      </div>
-      </>)}
 
       {activeTab === 'soal' && (
       <div className="bg-white border rounded-lg shadow-sm p-4 mb-4">
@@ -1806,6 +1809,8 @@ function Control() {
       </div>
       )}
 
+      </div>
+        </div>
       </>)}
     </div>
   )
