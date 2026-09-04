@@ -335,6 +335,7 @@ ipcMain.on('set-setting', (event, { key, value }) => {
         return
       }
       if (displayWindow) displayWindow.webContents.send('settings-updated', { key, value })
+      if (controlWindow) controlWindow.webContents.send('settings-updated', { key, value })
     }
   )
 })
@@ -346,6 +347,7 @@ ipcMain.on('delete-setting', (event, key) => {
       return
     }
     if (displayWindow) displayWindow.webContents.send('settings-updated', { key, value: null })
+    if (controlWindow) controlWindow.webContents.send('settings-updated', { key, value: null })
   })
 })
 

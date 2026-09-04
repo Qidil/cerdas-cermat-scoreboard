@@ -19,7 +19,7 @@ Cerdas Cermat Scoreboard menjawab semua masalah itu dengan menghadirkan aplikasi
 
 ## Key Features
 
-- **Tab-based Control Panel** — UI terorganisir dalam tab: **Operator** (TIM, SKOR, TIMER), **Soal**, **Tampilan**, **Histori**
+- **Control Panel Layout 2 Kolom** — kolom kiri **Operator** (TIM, SKOR, TIMER) selalu tampil, kolom kanan berganti antar tab **Soal**, **Tampilan**, **Histori**
 - **Manajemen Tim** — tambah/hapus tim (dengan konfirmasi), tampil real-time di kedua window
 - **Skor Real-time** — tambah/kurang skor dengan animasi pop-up (+/-) di Display
 - **Timer Countdown** — start, pause, resume, reset, dengan suara tick tiap detik dan animasi pulse
@@ -29,11 +29,11 @@ Cerdas Cermat Scoreboard menjawab semua masalah itu dengan menghadirkan aplikasi
 - **Backup & Restore** — simpan/load match ke file JSON
 - **Export PNG** — simpan tampilan Display sebagai gambar PNG
 - **Kustomisasi Header** — ubah teks header, warna, font (upload .ttf), ukuran (px), posisi offset (X/Y), bold/reguler
-- **Kustomisasi Warna Teks** — header, nama tim, skor, timer, footer — masing-masing bisa diatur sendiri
-- **Kustomisasi Background** — warna solid (color picker) atau upload gambar, lengkap dengan logo watermark (opacity bisa diatur)
-- **Kustomisasi Font** — upload font .ttf per elemen (header, nama tim, skor, timer, footer), ukuran (input number, min 1), posisi offset (X/Y), gap antar tim
+- **Kustomisasi Warna Teks** — header, nama tim, skor, timer — masing-masing bisa diatur sendiri
+- **Kustomisasi Background** — warna solid (color picker) atau upload gambar
+- **Kustomisasi Font** — upload font .ttf per elemen (header, nama tim, skor, timer), ukuran (input number, min 1), posisi offset (X/Y), gap antar tim
 - **Bold/Reguler Toggle** — pilih bold atau reguler untuk masing-masing elemen teks
-- **Sponsor Management** — tambah logo sponsor (upload + hapus), hide sponsor toggle
+- **Buka Lokasi Data** — tombol pintas membuka folder data aplikasi (database, backup) di file explorer
 
 ---
 
@@ -45,7 +45,7 @@ Tantangan terbesar dalam pembuatan aplikasi ini:
 2. **Native SQLite di Electron** — native module `sqlite3` harus di-rebuild ulang (`@electron/rebuild`) untuk setiap versi Electron yang berbeda
 3. **Kustomisasi tampilan real-time** — gambar/font diupload sebagai base64 dan langsung dirender tanpa restart aplikasi
 4. **Distribusi .exe portable** — satu folder portable yang bisa jalan langsung dari flashdisk tanpa instalasi
-5. **Ukuran distribusi** — file .exe ±223 MB melebihi batas 100 MB GitHub, distribusi via Google Drive
+5. **Ukuran distribusi** — file `.exe` portable berkisar 220-360 MB (tergantung versi dependency) melebihi batas 100 MB GitHub, distribusi via Google Drive
 
 ---
 
@@ -121,16 +121,16 @@ Hasilnya ada di `frontend/dist/`. _Langkah ini otomatis dijalankan oleh `npm run
 npm run build:exe
 ```
 
-Script ini otomatis menjalankan `build:vite` terlebih dahulu, lalu mem-package Electron + frontend ke `release/`. Proses ini menghasilkan folder `release/Cerdas Cermat Scoreboard-win32-x64/` dengan file `Cerdas Cermat Scoreboard.exe` yang bisa dijalankan langsung (portable, tanpa instalasi).
+Script ini otomatis menjalankan `build:vite` terlebih dahulu, lalu mem-package Electron + frontend ke `release/`. Proses ini menghasilkan folder `release/Cerdas Cermat Scoreboard v4-win32-x64/` (nama versi mengikuti `package.json` § `build:exe`) dengan file `Cerdas Cermat Scoreboard v4.exe` yang bisa dijalankan langsung (portable, tanpa instalasi).
 
 ### 4. Struktur Output
 
 ```
 release/
-└── Cerdas Cermat Scoreboard-win32-x64/
-    ├── Cerdas Cermat Scoreboard.exe   # ← Main executable
+└── Cerdas Cermat Scoreboard v4-win32-x64/
+    ├── Cerdas Cermat Scoreboard v4.exe   # ← Main executable
     ├── resources/
-    │   └── app.asar                  # Aplikasi Electron
+    │   └── app/                      # Kode aplikasi (main.js, database.js, preload.js, frontend/dist, node_modules)
     ├── locales/                       # File bahasa
     ├── d3dcompiler_47.dll
     ├── ffmpeg.dll

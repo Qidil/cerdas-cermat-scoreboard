@@ -15,39 +15,22 @@ const hexToRgba = (hex, opacity) => {
   return `rgba(${r},${g},${b},${opacity / 100})`
 }
 
-function Display() {
-  const [teams, setTeams] = useState([])
-  const [effect, setEffect] = useState(null)
-  const [feedback, setFeedback] = useState(null)
-  const [timer, setTimer] = useState(0)
-  const [isVisible, setIsVisible] = useState(false)
-  const correctSound = useRef(null)
-  const wrongSound = useRef(null)
-  const tickSound = useRef(null)
-  if (!correctSound.current) correctSound.current = new Audio(correctSoundFile)
-  if (!wrongSound.current) wrongSound.current = new Audio(wrongSoundFile)
-  if (!tickSound.current) tickSound.current = new Audio(tickSoundFile)
+function useDisplaySettings() {
   const [headerText, setHeaderText] = useState('')
   const [bgColor, setBgColor] = useState('#0f172a')
   const [bgImage, setBgImage] = useState('')
-  const [bgLogo, setBgLogo] = useState('')
-  const [bgLogoOpacity, setBgLogoOpacity] = useState(10)
-  const [sponsorLogos, setSponsorLogos] = useState([])
   const [textColorHeader, setTextColorHeader] = useState('#ffffff')
   const [textColorTeam, setTextColorTeam] = useState('#ffffff')
   const [textColorScore, setTextColorScore] = useState('#ffffff')
   const [textColorTimer, setTextColorTimer] = useState('#ffffff')
-  const [textColorFooter, setTextColorFooter] = useState('#ffffff')
   const [fontHeader, setFontHeader] = useState('')
   const [fontTeam, setFontTeam] = useState('')
   const [fontScore, setFontScore] = useState('')
   const [fontTimer, setFontTimer] = useState('')
-  const [fontFooter, setFontFooter] = useState('')
   const [fontSizeHeader, setFontSizeHeader] = useState(36)
   const [fontSizeTeam, setFontSizeTeam] = useState(24)
   const [fontSizeScore, setFontSizeScore] = useState(60)
   const [fontSizeTimer, setFontSizeTimer] = useState(48)
-  const [fontSizeFooter, setFontSizeFooter] = useState(14)
   const [posHeaderX, setPosHeaderX] = useState(0)
   const [posHeaderY, setPosHeaderY] = useState(0)
   const [posTeamX, setPosTeamX] = useState(0)
@@ -56,16 +39,11 @@ function Display() {
   const [posScoreY, setPosScoreY] = useState(0)
   const [posTimerX, setPosTimerX] = useState(0)
   const [posTimerY, setPosTimerY] = useState(0)
-  const [posFooterX, setPosFooterX] = useState(0)
-  const [posFooterY, setPosFooterY] = useState(0)
   const [teamGap, setTeamGap] = useState(80)
-  const [hideSponsor, setHideSponsor] = useState(false)
   const [fontWeightHeader, setFontWeightHeader] = useState('bold')
   const [fontWeightTeam, setFontWeightTeam] = useState('bold')
   const [fontWeightScore, setFontWeightScore] = useState('bold')
   const [fontWeightTimer, setFontWeightTimer] = useState('bold')
-  const [fontWeightFooter, setFontWeightFooter] = useState('normal')
-  const [activeSoal, setActiveSoal] = useState(null)
   const [popupWidth, setPopupWidth] = useState(900)
   const [popupHeight, setPopupHeight] = useState(500)
   const [popupBgColor, setPopupBgColor] = useState('#1e293b')
@@ -81,8 +59,6 @@ function Display() {
   const [popupBorderColor, setPopupBorderColor] = useState('#ffffff')
   const [popupBorderWidth, setPopupBorderWidth] = useState(0)
   const [popupShadow, setPopupShadow] = useState(true)
-  const [popupClosing, setPopupClosing] = useState(false)
-  const popupCloseTimer = useRef(null)
   const [popupFontBadge, setPopupFontBadge] = useState('')
   const [popupFontQuestion, setPopupFontQuestion] = useState('')
   const [popupFontOption, setPopupFontOption] = useState('')
@@ -96,38 +72,27 @@ function Display() {
   const [popupOptionBgPaddingY, setPopupOptionBgPaddingY] = useState(12)
   const [popupOptionPosX, setPopupOptionPosX] = useState(0)
   const [popupOptionPosY, setPopupOptionPosY] = useState(0)
+  const [isLoading, setIsLoading] = useState(true)
 
   useEffect(() => {
     if (!electronAPI) return
-
-    electronAPI.getTeams().then(setTeams)
-
-    electronAPI.onTeamsUpdate((data) => {
-      setTeams(data)
-    })
 
     electronAPI.getAllSettings().then((settings) => {
       if (settings.header_text) setHeaderText(settings.header_text)
       if (settings.bg_color) setBgColor(settings.bg_color)
       if (settings.bg_image) setBgImage(settings.bg_image)
-      if (settings.bg_logo) setBgLogo(settings.bg_logo)
-      if (settings.bg_logo_opacity) setBgLogoOpacity(parseInt(settings.bg_logo_opacity))
-      if (settings.sponsor_logos) setSponsorLogos(JSON.parse(settings.sponsor_logos))
       if (settings.text_color_header) setTextColorHeader(settings.text_color_header)
       if (settings.text_color_team) setTextColorTeam(settings.text_color_team)
       if (settings.text_color_score) setTextColorScore(settings.text_color_score)
       if (settings.text_color_timer) setTextColorTimer(settings.text_color_timer)
-      if (settings.text_color_footer) setTextColorFooter(settings.text_color_footer)
       if (settings.font_header) setFontHeader(settings.font_header)
       if (settings.font_team) setFontTeam(settings.font_team)
       if (settings.font_score) setFontScore(settings.font_score)
       if (settings.font_timer) setFontTimer(settings.font_timer)
-      if (settings.font_footer) setFontFooter(settings.font_footer)
       if (settings.font_size_header) setFontSizeHeader(parseInt(settings.font_size_header))
       if (settings.font_size_team) setFontSizeTeam(parseInt(settings.font_size_team))
       if (settings.font_size_score) setFontSizeScore(parseInt(settings.font_size_score))
       if (settings.font_size_timer) setFontSizeTimer(parseInt(settings.font_size_timer))
-      if (settings.font_size_footer) setFontSizeFooter(parseInt(settings.font_size_footer))
       if (settings.pos_header_x) setPosHeaderX(parseInt(settings.pos_header_x))
       if (settings.pos_header_y) setPosHeaderY(parseInt(settings.pos_header_y))
       if (settings.pos_team_x) setPosTeamX(parseInt(settings.pos_team_x))
@@ -136,15 +101,11 @@ function Display() {
       if (settings.pos_score_y) setPosScoreY(parseInt(settings.pos_score_y))
       if (settings.pos_timer_x) setPosTimerX(parseInt(settings.pos_timer_x))
       if (settings.pos_timer_y) setPosTimerY(parseInt(settings.pos_timer_y))
-      if (settings.pos_footer_x) setPosFooterX(parseInt(settings.pos_footer_x))
-      if (settings.pos_footer_y) setPosFooterY(parseInt(settings.pos_footer_y))
       if (settings.team_gap) setTeamGap(parseInt(settings.team_gap))
-      if (settings.hide_sponsor) setHideSponsor(settings.hide_sponsor === 'true')
       if (settings.font_weight_header) setFontWeightHeader(settings.font_weight_header)
       if (settings.font_weight_team) setFontWeightTeam(settings.font_weight_team)
       if (settings.font_weight_score) setFontWeightScore(settings.font_weight_score)
       if (settings.font_weight_timer) setFontWeightTimer(settings.font_weight_timer)
-      if (settings.font_weight_footer) setFontWeightFooter(settings.font_weight_footer)
       if (settings.popup_width) setPopupWidth(parseInt(settings.popup_width))
       if (settings.popup_height) setPopupHeight(parseInt(settings.popup_height))
       if (settings.popup_bg_color) setPopupBgColor(settings.popup_bg_color)
@@ -173,6 +134,8 @@ function Display() {
       if (settings.popup_option_bg_padding_y) setPopupOptionBgPaddingY(parseInt(settings.popup_option_bg_padding_y))
       if (settings.popup_option_pos_x) setPopupOptionPosX(parseInt(settings.popup_option_pos_x))
       if (settings.popup_option_pos_y) setPopupOptionPosY(parseInt(settings.popup_option_pos_y))
+
+      setIsLoading(false)
     })
 
     electronAPI.onSettingsUpdate((data) => {
@@ -180,24 +143,18 @@ function Display() {
         case 'header_text': setHeaderText(data.value); break
         case 'bg_color': setBgColor(data.value); break
         case 'bg_image': setBgImage(data.value); break
-        case 'bg_logo': setBgLogo(data.value); break
-        case 'bg_logo_opacity': setBgLogoOpacity(parseInt(data.value)); break
-        case 'sponsor_logos': setSponsorLogos(data.value ? JSON.parse(data.value) : []); break
         case 'text_color_header': setTextColorHeader(data.value); break
         case 'text_color_team': setTextColorTeam(data.value); break
         case 'text_color_score': setTextColorScore(data.value); break
         case 'text_color_timer': setTextColorTimer(data.value); break
-        case 'text_color_footer': setTextColorFooter(data.value); break
         case 'font_header': setFontHeader(data.value); break
         case 'font_team': setFontTeam(data.value); break
         case 'font_score': setFontScore(data.value); break
         case 'font_timer': setFontTimer(data.value); break
-        case 'font_footer': setFontFooter(data.value); break
         case 'font_size_header': setFontSizeHeader(parseInt(data.value)); break
         case 'font_size_team': setFontSizeTeam(parseInt(data.value)); break
         case 'font_size_score': setFontSizeScore(parseInt(data.value)); break
         case 'font_size_timer': setFontSizeTimer(parseInt(data.value)); break
-        case 'font_size_footer': setFontSizeFooter(parseInt(data.value)); break
         case 'pos_header_x': setPosHeaderX(parseInt(data.value)); break
         case 'pos_header_y': setPosHeaderY(parseInt(data.value)); break
         case 'pos_team_x': setPosTeamX(parseInt(data.value)); break
@@ -206,15 +163,11 @@ function Display() {
         case 'pos_score_y': setPosScoreY(parseInt(data.value)); break
         case 'pos_timer_x': setPosTimerX(parseInt(data.value)); break
         case 'pos_timer_y': setPosTimerY(parseInt(data.value)); break
-        case 'pos_footer_x': setPosFooterX(parseInt(data.value)); break
-        case 'pos_footer_y': setPosFooterY(parseInt(data.value)); break
         case 'team_gap': setTeamGap(parseInt(data.value)); break
-        case 'hide_sponsor': setHideSponsor(data.value === 'true'); break
         case 'font_weight_header': setFontWeightHeader(data.value); break
         case 'font_weight_team': setFontWeightTeam(data.value); break
         case 'font_weight_score': setFontWeightScore(data.value); break
         case 'font_weight_timer': setFontWeightTimer(data.value); break
-        case 'font_weight_footer': setFontWeightFooter(data.value); break
         case 'popup_width': setPopupWidth(parseInt(data.value)); break
         case 'popup_height': setPopupHeight(parseInt(data.value)); break
         case 'popup_bg_color': setPopupBgColor(data.value); break
@@ -244,6 +197,84 @@ function Display() {
         case 'popup_option_pos_x': setPopupOptionPosX(parseInt(data.value)); break
         case 'popup_option_pos_y': setPopupOptionPosY(parseInt(data.value)); break
       }
+    })
+  }, [])
+
+  return {
+    headerText, setHeaderText, bgColor, setBgColor, bgImage, setBgImage,
+    textColorHeader, setTextColorHeader, textColorTeam, setTextColorTeam,
+    textColorScore, setTextColorScore, textColorTimer, setTextColorTimer,
+    fontHeader, setFontHeader, fontTeam, setFontTeam, fontScore, setFontScore, fontTimer, setFontTimer,
+    fontSizeHeader, setFontSizeHeader, fontSizeTeam, setFontSizeTeam,
+    fontSizeScore, setFontSizeScore, fontSizeTimer, setFontSizeTimer,
+    posHeaderX, setPosHeaderX, posHeaderY, setPosHeaderY,
+    posTeamX, setPosTeamX, posTeamY, setPosTeamY,
+    posScoreX, setPosScoreX, posScoreY, setPosScoreY,
+    posTimerX, setPosTimerX, posTimerY, setPosTimerY,
+    teamGap, setTeamGap,
+    fontWeightHeader, setFontWeightHeader, fontWeightTeam, setFontWeightTeam,
+    fontWeightScore, setFontWeightScore, fontWeightTimer, setFontWeightTimer,
+    popupWidth, setPopupWidth, popupHeight, setPopupHeight,
+    popupBgColor, setPopupBgColor, popupBgImage, setPopupBgImage,
+    popupFont, setPopupFont, popupFontSize, setPopupFontSize,
+    popupTextColor, setPopupTextColor, popupOptionColor, setPopupOptionColor,
+    popupBadgeBgColor, setPopupBadgeBgColor, popupBadgeOpacity, setPopupBadgeOpacity,
+    popupOptionBgColor, setPopupOptionBgColor, popupOptionBgOpacity, setPopupOptionBgOpacity,
+    popupBorderColor, setPopupBorderColor, popupBorderWidth, setPopupBorderWidth, popupShadow, setPopupShadow,
+    popupFontBadge, setPopupFontBadge, popupFontQuestion, setPopupFontQuestion, popupFontOption, setPopupFontOption,
+    popupBadgeFontSize, setPopupBadgeFontSize,
+    popupBadgeBgPaddingX, setPopupBadgeBgPaddingX, popupBadgeBgPaddingY, setPopupBadgeBgPaddingY,
+    popupBadgePosX, setPopupBadgePosX, popupBadgePosY, setPopupBadgePosY,
+    popupOptionFontSize, setPopupOptionFontSize,
+    popupOptionBgPaddingX, setPopupOptionBgPaddingX, popupOptionBgPaddingY, setPopupOptionBgPaddingY,
+    popupOptionPosX, setPopupOptionPosX, popupOptionPosY, setPopupOptionPosY,
+    isLoading,
+  }
+}
+
+function Display() {
+  const [teams, setTeams] = useState([])
+  const [effect, setEffect] = useState(null)
+  const [feedback, setFeedback] = useState(null)
+  const [timer, setTimer] = useState(0)
+  const [isVisible, setIsVisible] = useState(false)
+  const correctSound = useRef(null)
+  const wrongSound = useRef(null)
+  const tickSound = useRef(null)
+
+  useEffect(() => {
+    if (correctSound.current == null) correctSound.current = new Audio(correctSoundFile)
+    if (wrongSound.current == null) wrongSound.current = new Audio(wrongSoundFile)
+    if (tickSound.current == null) tickSound.current = new Audio(tickSoundFile)
+  }, [])
+
+  const {
+    headerText, bgColor, bgImage,
+    textColorHeader, textColorTeam, textColorScore, textColorTimer,
+    fontHeader, fontTeam, fontScore, fontTimer,
+    fontSizeHeader, fontSizeTeam, fontSizeScore, fontSizeTimer,
+    posHeaderX, posHeaderY, posTeamX, posTeamY, posScoreX, posScoreY, posTimerX, posTimerY,
+    teamGap,
+    fontWeightHeader, fontWeightTeam, fontWeightScore, fontWeightTimer,
+    popupWidth, popupHeight, popupBgColor, popupBgImage, popupFont, popupFontSize,
+    popupTextColor, popupOptionColor, popupBadgeBgColor, popupBadgeOpacity,
+    popupOptionBgColor, popupOptionBgOpacity, popupBorderColor, popupBorderWidth, popupShadow,
+    popupFontBadge, popupFontQuestion, popupFontOption,
+    popupBadgeFontSize, popupBadgeBgPaddingX, popupBadgeBgPaddingY, popupBadgePosX, popupBadgePosY,
+    popupOptionFontSize, popupOptionBgPaddingX, popupOptionBgPaddingY, popupOptionPosX, popupOptionPosY,
+  } = useDisplaySettings()
+
+  const [activeSoal, setActiveSoal] = useState(null)
+  const [popupClosing, setPopupClosing] = useState(false)
+  const popupCloseTimer = useRef(null)
+
+  useEffect(() => {
+    if (!electronAPI) return
+
+    electronAPI.getTeams().then(setTeams)
+
+    electronAPI.onTeamsUpdate((data) => {
+      setTeams(data)
     })
   }, [])
 
@@ -328,7 +359,6 @@ function Display() {
       { data: fontTeam, name: 'CerdasTeam' },
       { data: fontScore, name: 'CerdasScore' },
       { data: fontTimer, name: 'CerdasTimer' },
-      { data: fontFooter, name: 'CerdasFooter' },
       { data: popupFont, name: 'CerdasPopup' },
       { data: popupFontBadge, name: 'CerdasPopupBadge' },
       { data: popupFontQuestion, name: 'CerdasPopupQuestion' },
@@ -341,7 +371,7 @@ function Display() {
         document.fonts.add(fontFace)
       }).catch(() => {})
     }))
-  }, [fontHeader, fontTeam, fontScore, fontTimer, fontFooter, popupFont, popupFontBadge, popupFontQuestion, popupFontOption])
+  }, [fontHeader, fontTeam, fontScore, fontTimer, popupFont, popupFontBadge, popupFontQuestion, popupFontOption])
 
   return (
     <div
@@ -361,15 +391,6 @@ function Display() {
       </div>
 
       <div className="h-[78%] flex flex-col items-center justify-center relative">
-        {bgLogo && (
-          <img
-            src={bgLogo}
-            className="absolute inset-0 w-full h-full object-contain pointer-events-none"
-            style={{ opacity: bgLogoOpacity / 100 }}
-            alt=""
-          />
-        )}
-
         <div className="flex" style={{ gap: `${teamGap}px` }}>
           {teams.map((team) => (
             <div key={team.id} className="text-center relative" style={{ transform: `translate(${posTeamX}px, ${posTeamY}px)` }}>
@@ -400,29 +421,6 @@ function Display() {
         )}
       </div>
 
-      {!hideSponsor && (
-        <div className="h-[10%] flex items-end justify-end pr-6 pb-4" style={{ color: textColorFooter, fontFamily: fontFooter ? 'CerdasFooter' : undefined, fontSize: `${fontSizeFooter}px`, fontWeight: fontWeightFooter, transform: `translate(${posFooterX}px, ${posFooterY}px)` }}>
-          <div className="flex items-center gap-2 flex-wrap justify-end">
-            {sponsorLogos.filter((s) => s.category === 'supported').length > 0 && (
-              <>
-                <span>SUPPORTED BY</span>
-                {sponsorLogos.filter((s) => s.category === 'supported').map((s, i) => (
-                  <img key={i} src={s.dataUrl} alt={s.name} className="h-6 object-contain" />
-                ))}
-              </>
-            )}
-            {sponsorLogos.filter((s) => s.category === 'sponsored').length > 0 && (
-              <>
-                <span>| SPONSORED BY</span>
-                {sponsorLogos.filter((s) => s.category === 'sponsored').map((s, i) => (
-                  <img key={i} src={s.dataUrl} alt={s.name} className="h-6 object-contain" />
-                ))}
-              </>
-            )}
-            {sponsorLogos.length === 0 && 'SUPPORTED BY [logo] [logo] | SPONSORED BY [logo] [logo]'}
-          </div>
-        </div>
-      )}
 
       {activeSoal && (
         <div className={`absolute inset-0 flex items-center justify-center z-40 p-10 ${popupClosing ? 'animate-popup-out' : 'animate-popup-in'}`}>
@@ -526,85 +524,72 @@ function Control() {
   const [history, setHistory] = useState([])
   const [files, setFiles] = useState([])
   const [timeInput, setTimeInput] = useState('')
-  const [headerText, setHeaderText] = useState('')
-  const [bgColor, setBgColor] = useState('#0f172a')
-  const [bgImage, setBgImage] = useState('')
-  const [bgLogo, setBgLogo] = useState('')
-  const [bgLogoOpacity, setBgLogoOpacity] = useState(10)
-  const [sponsorLogos, setSponsorLogos] = useState([])
-  const [sponsorCategory, setSponsorCategory] = useState('supported')
-  const [textColorHeader, setTextColorHeader] = useState('#ffffff')
-  const [textColorTeam, setTextColorTeam] = useState('#ffffff')
-  const [textColorScore, setTextColorScore] = useState('#ffffff')
-  const [textColorTimer, setTextColorTimer] = useState('#ffffff')
-  const [textColorFooter, setTextColorFooter] = useState('#ffffff')
   const [activeTab, setActiveTab] = useState('soal')
   const [soalList, setSoalList] = useState([])
   const [activeSoalId, setActiveSoalId] = useState(null)
-  const [popupWidth, setPopupWidth] = useState(900)
-  const [popupHeight, setPopupHeight] = useState(500)
-  const [popupBgColor, setPopupBgColor] = useState('#1e293b')
-  const [popupBgImage, setPopupBgImage] = useState('')
-  const [popupFont, setPopupFont] = useState('')
-  const [popupFontSize, setPopupFontSize] = useState(36)
-  const [popupTextColor, setPopupTextColor] = useState('#ffffff')
-  const [popupOptionColor, setPopupOptionColor] = useState('#94a3b8')
-  const [popupBadgeBgColor, setPopupBadgeBgColor] = useState('#ffffff')
-  const [popupBadgeOpacity, setPopupBadgeOpacity] = useState(15)
-  const [popupOptionBgColor, setPopupOptionBgColor] = useState('#ffffff')
-  const [popupOptionBgOpacity, setPopupOptionBgOpacity] = useState(10)
-  const [popupBorderColor, setPopupBorderColor] = useState('#ffffff')
-  const [popupBorderWidth, setPopupBorderWidth] = useState(0)
-  const [popupShadow, setPopupShadow] = useState(true)
-  const [popupFontBadge, setPopupFontBadge] = useState('')
-  const [popupFontQuestion, setPopupFontQuestion] = useState('')
-  const [popupFontOption, setPopupFontOption] = useState('')
-  const [popupBadgeFontSize, setPopupBadgeFontSize] = useState(14)
-  const [popupBadgeBgPaddingX, setPopupBadgeBgPaddingX] = useState(12)
-  const [popupBadgeBgPaddingY, setPopupBadgeBgPaddingY] = useState(4)
-  const [popupBadgePosX, setPopupBadgePosX] = useState(0)
-  const [popupBadgePosY, setPopupBadgePosY] = useState(0)
-  const [popupOptionFontSize, setPopupOptionFontSize] = useState(20)
-  const [popupOptionBgPaddingX, setPopupOptionBgPaddingX] = useState(24)
-  const [popupOptionBgPaddingY, setPopupOptionBgPaddingY] = useState(12)
-  const [popupOptionPosX, setPopupOptionPosX] = useState(0)
-  const [popupOptionPosY, setPopupOptionPosY] = useState(0)
   const [exporting, setExporting] = useState(false)
-  const [fontHeader, setFontHeader] = useState('')
   const [fontHeaderName, setFontHeaderName] = useState('')
-  const [fontTeam, setFontTeam] = useState('')
   const [fontTeamName, setFontTeamName] = useState('')
-  const [fontScore, setFontScore] = useState('')
   const [fontScoreName, setFontScoreName] = useState('')
-  const [fontTimer, setFontTimer] = useState('')
   const [fontTimerName, setFontTimerName] = useState('')
-  const [fontFooter, setFontFooter] = useState('')
-  const [fontFooterName, setFontFooterName] = useState('')
-  const [fontSizeHeader, setFontSizeHeader] = useState(36)
-  const [fontSizeTeam, setFontSizeTeam] = useState(24)
-  const [fontSizeScore, setFontSizeScore] = useState(60)
-  const [fontSizeTimer, setFontSizeTimer] = useState(48)
-  const [fontSizeFooter, setFontSizeFooter] = useState(14)
-  const [posHeaderX, setPosHeaderX] = useState(0)
-  const [posHeaderY, setPosHeaderY] = useState(0)
-  const [posTeamX, setPosTeamX] = useState(0)
-  const [posTeamY, setPosTeamY] = useState(0)
-  const [posScoreX, setPosScoreX] = useState(0)
-  const [posScoreY, setPosScoreY] = useState(0)
-  const [posTimerX, setPosTimerX] = useState(0)
-  const [posTimerY, setPosTimerY] = useState(0)
-  const [posFooterX, setPosFooterX] = useState(0)
-  const [posFooterY, setPosFooterY] = useState(0)
-  const [teamGap, setTeamGap] = useState(80)
-  const [hideSponsor, setHideSponsor] = useState(false)
-  const [fontWeightHeader, setFontWeightHeader] = useState('bold')
-  const [fontWeightTeam, setFontWeightTeam] = useState('bold')
-  const [fontWeightScore, setFontWeightScore] = useState('bold')
-  const [fontWeightTimer, setFontWeightTimer] = useState('bold')
-  const [fontWeightFooter, setFontWeightFooter] = useState('normal')
   const [notification, setNotification] = useState('')
   const [confirmDelete, setConfirmDelete] = useState(null)
-  const [isLoading, setIsLoading] = useState(true)
+
+  const {
+    headerText, setHeaderText,
+    bgColor, setBgColor,
+    bgImage, setBgImage,
+    textColorHeader, setTextColorHeader,
+    textColorTeam, setTextColorTeam,
+    textColorScore, setTextColorScore,
+    textColorTimer, setTextColorTimer,
+    fontHeader, setFontHeader,
+    fontTeam, setFontTeam,
+    fontScore, setFontScore,
+    fontTimer, setFontTimer,
+    fontSizeHeader, setFontSizeHeader,
+    fontSizeTeam, setFontSizeTeam,
+    fontSizeScore, setFontSizeScore,
+    fontSizeTimer, setFontSizeTimer,
+    posHeaderX, setPosHeaderX, posHeaderY, setPosHeaderY,
+    posTeamX, setPosTeamX, posTeamY, setPosTeamY,
+    posScoreX, setPosScoreX, posScoreY, setPosScoreY,
+    posTimerX, setPosTimerX, posTimerY, setPosTimerY,
+    teamGap, setTeamGap,
+    fontWeightHeader, setFontWeightHeader,
+    fontWeightTeam, setFontWeightTeam,
+    fontWeightScore, setFontWeightScore,
+    fontWeightTimer, setFontWeightTimer,
+    popupWidth, setPopupWidth,
+    popupHeight, setPopupHeight,
+    popupBgColor, setPopupBgColor,
+    popupBgImage, setPopupBgImage,
+    popupFont, setPopupFont,
+    popupFontSize, setPopupFontSize,
+    popupTextColor, setPopupTextColor,
+    popupOptionColor, setPopupOptionColor,
+    popupBadgeBgColor, setPopupBadgeBgColor,
+    popupBadgeOpacity, setPopupBadgeOpacity,
+    popupOptionBgColor, setPopupOptionBgColor,
+    popupOptionBgOpacity, setPopupOptionBgOpacity,
+    popupBorderColor, setPopupBorderColor,
+    popupBorderWidth, setPopupBorderWidth,
+    popupShadow, setPopupShadow,
+    popupFontBadge, setPopupFontBadge,
+    popupFontQuestion, setPopupFontQuestion,
+    popupFontOption, setPopupFontOption,
+    popupBadgeFontSize, setPopupBadgeFontSize,
+    popupBadgeBgPaddingX, setPopupBadgeBgPaddingX,
+    popupBadgeBgPaddingY, setPopupBadgeBgPaddingY,
+    popupBadgePosX, setPopupBadgePosX,
+    popupBadgePosY, setPopupBadgePosY,
+    popupOptionFontSize, setPopupOptionFontSize,
+    popupOptionBgPaddingX, setPopupOptionBgPaddingX,
+    popupOptionBgPaddingY, setPopupOptionBgPaddingY,
+    popupOptionPosX, setPopupOptionPosX,
+    popupOptionPosY, setPopupOptionPosY,
+    isLoading,
+  } = useDisplaySettings()
 
   const readFileAsDataURL = (file) => {
     return new Promise((resolve) => {
@@ -636,77 +621,6 @@ function Control() {
       electronAPI.getSavedFiles().then(setFiles)
     })
 
-    electronAPI.getAllSettings().then((settings) => {
-      if (settings.header_text) setHeaderText(settings.header_text)
-      if (settings.bg_color) setBgColor(settings.bg_color)
-      if (settings.bg_image) setBgImage(settings.bg_image)
-      if (settings.bg_logo) setBgLogo(settings.bg_logo)
-      if (settings.bg_logo_opacity) setBgLogoOpacity(parseInt(settings.bg_logo_opacity))
-      if (settings.sponsor_logos) setSponsorLogos(JSON.parse(settings.sponsor_logos))
-      if (settings.text_color_header) setTextColorHeader(settings.text_color_header)
-      if (settings.text_color_team) setTextColorTeam(settings.text_color_team)
-      if (settings.text_color_score) setTextColorScore(settings.text_color_score)
-      if (settings.text_color_timer) setTextColorTimer(settings.text_color_timer)
-      if (settings.text_color_footer) setTextColorFooter(settings.text_color_footer)
-      if (settings.font_header) setFontHeader(settings.font_header)
-      if (settings.font_team) setFontTeam(settings.font_team)
-      if (settings.font_score) setFontScore(settings.font_score)
-      if (settings.font_timer) setFontTimer(settings.font_timer)
-      if (settings.font_footer) setFontFooter(settings.font_footer)
-      if (settings.font_size_header) setFontSizeHeader(parseInt(settings.font_size_header))
-      if (settings.font_size_team) setFontSizeTeam(parseInt(settings.font_size_team))
-      if (settings.font_size_score) setFontSizeScore(parseInt(settings.font_size_score))
-      if (settings.font_size_timer) setFontSizeTimer(parseInt(settings.font_size_timer))
-      if (settings.font_size_footer) setFontSizeFooter(parseInt(settings.font_size_footer))
-      if (settings.pos_header_x) setPosHeaderX(parseInt(settings.pos_header_x))
-      if (settings.pos_header_y) setPosHeaderY(parseInt(settings.pos_header_y))
-      if (settings.pos_team_x) setPosTeamX(parseInt(settings.pos_team_x))
-      if (settings.pos_team_y) setPosTeamY(parseInt(settings.pos_team_y))
-      if (settings.pos_score_x) setPosScoreX(parseInt(settings.pos_score_x))
-      if (settings.pos_score_y) setPosScoreY(parseInt(settings.pos_score_y))
-      if (settings.pos_timer_x) setPosTimerX(parseInt(settings.pos_timer_x))
-      if (settings.pos_timer_y) setPosTimerY(parseInt(settings.pos_timer_y))
-      if (settings.pos_footer_x) setPosFooterX(parseInt(settings.pos_footer_x))
-      if (settings.pos_footer_y) setPosFooterY(parseInt(settings.pos_footer_y))
-      if (settings.team_gap) setTeamGap(parseInt(settings.team_gap))
-      if (settings.hide_sponsor) setHideSponsor(settings.hide_sponsor === 'true')
-      if (settings.font_weight_header) setFontWeightHeader(settings.font_weight_header)
-      if (settings.font_weight_team) setFontWeightTeam(settings.font_weight_team)
-      if (settings.font_weight_score) setFontWeightScore(settings.font_weight_score)
-      if (settings.font_weight_timer) setFontWeightTimer(settings.font_weight_timer)
-      if (settings.font_weight_footer) setFontWeightFooter(settings.font_weight_footer)
-      if (settings.popup_width) setPopupWidth(parseInt(settings.popup_width))
-      if (settings.popup_height) setPopupHeight(parseInt(settings.popup_height))
-      if (settings.popup_bg_color) setPopupBgColor(settings.popup_bg_color)
-      if (settings.popup_bg_image) setPopupBgImage(settings.popup_bg_image)
-      if (settings.popup_font) setPopupFont(settings.popup_font)
-      if (settings.popup_font_size) setPopupFontSize(parseInt(settings.popup_font_size))
-      if (settings.popup_text_color) setPopupTextColor(settings.popup_text_color)
-      if (settings.popup_option_color) setPopupOptionColor(settings.popup_option_color)
-      if (settings.popup_badge_bg_color) setPopupBadgeBgColor(settings.popup_badge_bg_color)
-      if (settings.popup_badge_opacity) setPopupBadgeOpacity(parseInt(settings.popup_badge_opacity))
-      if (settings.popup_option_bg_color) setPopupOptionBgColor(settings.popup_option_bg_color)
-      if (settings.popup_option_bg_opacity) setPopupOptionBgOpacity(parseInt(settings.popup_option_bg_opacity))
-      if (settings.popup_border_color) setPopupBorderColor(settings.popup_border_color)
-      if (settings.popup_border_width) setPopupBorderWidth(parseInt(settings.popup_border_width))
-      if (settings.popup_shadow) setPopupShadow(settings.popup_shadow === 'true')
-      if (settings.popup_font_badge) setPopupFontBadge(settings.popup_font_badge)
-      if (settings.popup_font_question) setPopupFontQuestion(settings.popup_font_question)
-      if (settings.popup_font_option) setPopupFontOption(settings.popup_font_option)
-      if (settings.popup_badge_font_size) setPopupBadgeFontSize(parseInt(settings.popup_badge_font_size))
-      if (settings.popup_badge_bg_padding_x) setPopupBadgeBgPaddingX(parseInt(settings.popup_badge_bg_padding_x))
-      if (settings.popup_badge_bg_padding_y) setPopupBadgeBgPaddingY(parseInt(settings.popup_badge_bg_padding_y))
-      if (settings.popup_badge_pos_x) setPopupBadgePosX(parseInt(settings.popup_badge_pos_x))
-      if (settings.popup_badge_pos_y) setPopupBadgePosY(parseInt(settings.popup_badge_pos_y))
-      if (settings.popup_option_font_size) setPopupOptionFontSize(parseInt(settings.popup_option_font_size))
-      if (settings.popup_option_bg_padding_x) setPopupOptionBgPaddingX(parseInt(settings.popup_option_bg_padding_x))
-      if (settings.popup_option_bg_padding_y) setPopupOptionBgPaddingY(parseInt(settings.popup_option_bg_padding_y))
-      if (settings.popup_option_pos_x) setPopupOptionPosX(parseInt(settings.popup_option_pos_x))
-      if (settings.popup_option_pos_y) setPopupOptionPosY(parseInt(settings.popup_option_pos_y))
-
-      setIsLoading(false)
-    })
-
     electronAPI.onOperationError((msg) => {
       setNotification(msg)
     })
@@ -719,7 +633,7 @@ function Control() {
   }, [notification])
 
   const handleAddTeam = () => {
-    if (!teamName) return
+    if (!teamName.trim()) return
     electronAPI?.addTeam(teamName)
     setTeamName('')
   }
@@ -1179,137 +1093,6 @@ function Control() {
               {bgImage && <img src={bgImage} className="h-12 mt-1 object-contain" alt="preview" />}
             </div>
 
-            {/* LOGO BACKGROUND */}
-            <div>
-              <label className="block font-semibold text-sm">Logo Background</label>
-              <div className="flex gap-2">
-                <input
-                  type="file"
-                  accept="image/*"
-                  onChange={async (e) => {
-                    const file = e.target.files[0]
-                    if (file) {
-                      const dataUrl = await readFileAsDataURL(file)
-                      setBgLogo(dataUrl)
-                      electronAPI?.setSetting('bg_logo', dataUrl)
-                    }
-                  }}
-                  className="border p-2 text-sm flex-1"
-                />
-                {bgLogo && (
-                  <button onClick={() => {
-                    setBgLogo('')
-                    electronAPI?.deleteSetting('bg_logo')
-                  }} className="bg-red-500 text-white px-2 py-1 text-sm rounded">Hapus</button>
-                )}
-              </div>
-              {bgLogo && <img src={bgLogo} className="h-12 mt-1 object-contain" alt="logo preview" />}
-              <label className="block text-xs text-gray-500 mt-1">Opacity: {bgLogoOpacity}%</label>
-              <input
-                type="range"
-                min="0"
-                max="100"
-                value={bgLogoOpacity}
-                onChange={(e) => {
-                  const val = parseInt(e.target.value)
-                  setBgLogoOpacity(val)
-                  electronAPI?.setSetting('bg_logo_opacity', String(val))
-                }}
-                className="w-full"
-              />
-            </div>
-
-            {/* SPONSOR */}
-            <div>
-              <label className="block font-semibold text-sm">Logo Sponsor</label>
-              <div className="flex gap-2 items-center mb-2">
-                <select value={sponsorCategory} onChange={(e) => setSponsorCategory(e.target.value)} className="border p-2 text-sm">
-                  <option value="supported">SUPPORTED BY</option>
-                  <option value="sponsored">SPONSORED BY</option>
-                </select>
-                <input
-                  type="file"
-                  accept="image/*"
-                  onChange={async (e) => {
-                    const file = e.target.files[0]
-                    if (file) {
-                      const dataUrl = await readFileAsDataURL(file)
-                      const updated = [...sponsorLogos, { name: file.name, dataUrl, category: sponsorCategory }]
-                      setSponsorLogos(updated)
-                      electronAPI?.setSetting('sponsor_logos', JSON.stringify(updated))
-                    }
-                  }}
-                  className="border p-2 text-sm flex-1"
-                />
-              </div>
-              <div className="mb-2">
-                {sponsorLogos.filter((s) => s.category === 'supported').length > 0 && (
-                  <div className="mb-1">
-                    <p className="text-xs font-semibold text-gray-500">SUPPORTED BY</p>
-                    <div className="flex flex-wrap gap-2 mt-1">
-                      {sponsorLogos.filter((s) => s.category === 'supported').map((s) => (
-                        <div key={sponsorLogos.indexOf(s)} className="relative group">
-                          <img src={s.dataUrl} alt={s.name} className="h-8 object-contain" />
-                          <button
-                            onClick={() => {
-                              const globalIndex = sponsorLogos.findIndex((item) => item === s)
-                              const updated = sponsorLogos.filter((_, idx) => idx !== globalIndex)
-                              setSponsorLogos(updated)
-                              if (updated.length === 0) {
-                                electronAPI?.deleteSetting('sponsor_logos')
-                              } else {
-                                electronAPI?.setSetting('sponsor_logos', JSON.stringify(updated))
-                              }
-                            }}
-                            className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full w-4 h-4 flex items-center justify-center opacity-0 group-hover:opacity-100"
-                          >&times;</button>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                )}
-                {sponsorLogos.filter((s) => s.category === 'sponsored').length > 0 && (
-                  <div>
-                    <p className="text-xs font-semibold text-gray-500">SPONSORED BY</p>
-                    <div className="flex flex-wrap gap-2 mt-1">
-                      {sponsorLogos.filter((s) => s.category === 'sponsored').map((s) => (
-                        <div key={sponsorLogos.indexOf(s)} className="relative group">
-                          <img src={s.dataUrl} alt={s.name} className="h-8 object-contain" />
-                          <button
-                            onClick={() => {
-                              const globalIndex = sponsorLogos.findIndex((item) => item === s)
-                              const updated = sponsorLogos.filter((_, idx) => idx !== globalIndex)
-                              setSponsorLogos(updated)
-                              if (updated.length === 0) {
-                                electronAPI?.deleteSetting('sponsor_logos')
-                              } else {
-                                electronAPI?.setSetting('sponsor_logos', JSON.stringify(updated))
-                              }
-                            }}
-                            className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full w-4 h-4 flex items-center justify-center opacity-0 group-hover:opacity-100"
-                          >&times;</button>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                )}
-                {sponsorLogos.length === 0 && <p className="text-xs text-gray-400">Belum ada logo sponsor</p>}
-              </div>
-              <label className="flex items-center gap-2 text-sm cursor-pointer mt-2">
-                <input
-                  type="checkbox"
-                  checked={hideSponsor}
-                  onChange={(e) => {
-                    const val = e.target.checked
-                    setHideSponsor(val)
-                    electronAPI?.setSetting('hide_sponsor', String(val))
-                  }}
-                  className="w-4 h-4"
-                />
-                Sembunyikan sponsor di layar display
-              </label>
-            </div>
-
             {/* WARNA TEKS */}
             <div>
               <label className="block font-semibold text-sm mb-2">Warna Teks</label>
@@ -1329,10 +1112,6 @@ function Control() {
                 <div>
                   <label className="text-xs text-gray-500">Timer</label>
                   <input type="color" value={textColorTimer} onChange={(e) => { setTextColorTimer(e.target.value); electronAPI?.setSetting('text_color_timer', e.target.value) }} className="border p-1 w-full h-8" />
-                </div>
-                <div>
-                  <label className="text-xs text-gray-500">Footer</label>
-                  <input type="color" value={textColorFooter} onChange={(e) => { setTextColorFooter(e.target.value); electronAPI?.setSetting('text_color_footer', e.target.value) }} className="border p-1 w-full h-8" />
                 </div>
               </div>
             </div>
@@ -1363,12 +1142,6 @@ function Control() {
                   <span className="w-24 text-xs">Timer</span>
                   <input type="number" min="1" value={fontSizeTimer}
                     onChange={(e) => { const v = parseInt(e.target.value) || 1; setFontSizeTimer(v); handleSetSetting('font_size_timer', v) }}
-                    className="border p-1 text-xs w-20" />
-                </div>
-                <div className="flex items-center gap-2">
-                  <span className="w-24 text-xs">Footer</span>
-                  <input type="number" min="1" value={fontSizeFooter}
-                    onChange={(e) => { const v = parseInt(e.target.value) || 1; setFontSizeFooter(v); handleSetSetting('font_size_footer', v) }}
                     className="border p-1 text-xs w-20" />
                 </div>
               </div>
@@ -1409,15 +1182,6 @@ function Control() {
                   <span className="w-24 text-xs">Timer</span>
                   <select value={fontWeightTimer}
                     onChange={(e) => { const v = e.target.value; setFontWeightTimer(v); handleSetSetting('font_weight_timer', v) }}
-                    className="border p-1 text-xs w-20">
-                    <option value="bold">Bold</option>
-                    <option value="normal">Reguler</option>
-                  </select>
-                </div>
-                <div className="flex items-center gap-2">
-                  <span className="w-24 text-xs">Footer</span>
-                  <select value={fontWeightFooter}
-                    onChange={(e) => { const v = e.target.value; setFontWeightFooter(v); handleSetSetting('font_weight_footer', v) }}
                     className="border p-1 text-xs w-20">
                     <option value="bold">Bold</option>
                     <option value="normal">Reguler</option>
@@ -1468,16 +1232,6 @@ function Control() {
                   <span className="text-xs">Y</span>
                   <input type="number" value={posTimerY}
                     onChange={(e) => { const v = parseInt(e.target.value) || 0; setPosTimerY(v); handleSetSetting('pos_timer_y', v) }}
-                    className="border p-1 text-xs w-16" />
-                </div>
-                <div className="flex items-center gap-2">
-                  <span className="w-24 text-xs">Footer X</span>
-                  <input type="number" value={posFooterX}
-                    onChange={(e) => { const v = parseInt(e.target.value) || 0; setPosFooterX(v); handleSetSetting('pos_footer_x', v) }}
-                    className="border p-1 text-xs w-16" />
-                  <span className="text-xs">Y</span>
-                  <input type="number" value={posFooterY}
-                    onChange={(e) => { const v = parseInt(e.target.value) || 0; setPosFooterY(v); handleSetSetting('pos_footer_y', v) }}
                     className="border p-1 text-xs w-16" />
                 </div>
                 <div className="flex items-center gap-2">
@@ -1572,26 +1326,6 @@ function Control() {
                     }} className="text-red-500 text-xs">Hapus</button>
                   )}
                   {fontTimerName && <span className="text-xs text-gray-500 truncate max-w-[80px]">{fontTimerName}</span>}
-                </div>
-                <div className="flex items-center gap-2">
-                  <span className="w-20 text-xs">Footer</span>
-                  <input type="file" accept=".ttf" onChange={async (e) => {
-                    const file = e.target.files[0]
-                    if (file) {
-                      const dataUrl = await readFileAsDataURL(file)
-                      setFontFooter(dataUrl)
-                      setFontFooterName(file.name)
-                      electronAPI?.setSetting('font_footer', dataUrl)
-                    }
-                  }} className="border p-1 text-xs flex-1" />
-                  {fontFooter && (
-                    <button onClick={() => {
-                      setFontFooter('')
-                      setFontFooterName('')
-                      electronAPI?.deleteSetting('font_footer')
-                    }} className="text-red-500 text-xs">Hapus</button>
-                  )}
-                  {fontFooterName && <span className="text-xs text-gray-500 truncate max-w-[80px]">{fontFooterName}</span>}
                 </div>
               </div>
             </div>
