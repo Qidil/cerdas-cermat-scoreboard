@@ -20,6 +20,12 @@ contextBridge.exposeInMainWorld('electronAPI', {
     getHistory: () => ipcRenderer.invoke('get-history'),
     onHistoryUpdate: (callback) =>
         ipcRenderer.on('history-updated', (event, data) => callback(data)),
+    resetHistory: () => ipcRenderer.send('reset-history'),
+    onHistoryResetResult: (callback) =>
+        ipcRenderer.on('history-reset-result', (event, data) => callback(data)),
+    getHistoryArchives: () => ipcRenderer.invoke('get-history-archives'),
+    exportHistoryCsv: (archiveFile) => ipcRenderer.invoke('export-history-csv', archiveFile),
+    deleteHistoryArchive: (fileName) => ipcRenderer.invoke('delete-history-archive', fileName),
     saveMatch: () => ipcRenderer.send('save-match'),
     onSaveSuccess: (callback) =>
     ipcRenderer.on('save-success', (e, data) => callback(data)),

@@ -1,0 +1,11 @@
+{
+    "schema_version": 2,
+    "commit": "df6ff3928338f56ab7a40511ddc51ebe7eb980b2",
+    "indexed_at": "2026-11-26T14:24:28Z",
+    "project": "cerdas-cermat-scoreboard",
+    "nodes": 223,
+    "edges": 440,
+    "original_size": 2228224,
+    "compressed_size": 197347,
+    "compression_level": 9
+}

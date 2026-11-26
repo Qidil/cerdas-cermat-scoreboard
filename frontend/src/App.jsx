@@ -523,6 +523,7 @@ function Control() {
   const [value, setValue] = useState(0)
   const [history, setHistory] = useState([])
   const [files, setFiles] = useState([])
+  const [historyArchives, setHistoryArchives] = useState([])
   const [timeInput, setTimeInput] = useState('')
   const [activeTab, setActiveTab] = useState('soal')
   const [soalList, setSoalList] = useState([])
@@ -534,6 +535,11 @@ function Control() {
   const [fontTimerName, setFontTimerName] = useState('')
   const [notification, setNotification] = useState('')
   const [confirmDelete, setConfirmDelete] = useState(null)
+  const [confirmHistoryReset, setConfirmHistoryReset] = useState(false)
+  const [confirmArchiveDelete, setConfirmArchiveDelete] = useState(null)
+  const [resettingHistory, setResettingHistory] = useState(false)
+  const [exportingHistory, setExportingHistory] = useState(false)
+  const [deletingArchive, setDeletingArchive] = useState(null)
 
   const {
     headerText, setHeaderText,
@@ -615,6 +621,14 @@ function Control() {
     })
 
     electronAPI.getSavedFiles().then(setFiles)
+    electronAPI.getHistoryArchives().then(setHistoryArchives).catch((err) => setNotification('Gagal memuat arsip history: ' + err.message))
+
+    electronAPI.onHistoryResetResult((result) => {
+      setResettingHistory(false)
+      setConfirmHistoryReset(false)
+      setNotification(result.empty ? 'History masih kosong' : `History diarsipkan: ${result.file} (${result.count} baris)`)
+      if (!result.empty) electronAPI.getHistoryArchives().then(setHistoryArchives)
+    })
 
     electronAPI.onSaveSuccess((file) => {
       setNotification('Tersimpan: ' + file)
@@ -622,9 +636,43 @@ function Control() {
     })
 
     electronAPI.onOperationError((msg) => {
+      setResettingHistory(false)
+      setDeletingArchive(null)
+      setExportingHistory(false)
       setNotification(msg)
     })
   }, [])
+
+  const handleExportHistoryCsv = async (archiveFile = '') => {
+    setExportingHistory(true)
+    try {
+      const result = await electronAPI?.exportHistoryCsv(archiveFile)
+      if (result?.filePath) setNotification('CSV tersimpan: ' + result.filePath.split(/[\\/]/).pop())
+      else if (result?.canceled) setNotification('Export CSV dibatalkan')
+      else if (result?.error) setNotification('Gagal export CSV: ' + result.error)
+    } catch (err) {
+      setNotification('Gagal export CSV: ' + err.message)
+    } finally {
+      setExportingHistory(false)
+    }
+  }
+
+  const handleDeleteHistoryArchive = async (fileName) => {
+    setDeletingArchive(fileName)
+    try {
+      const result = await electronAPI?.deleteHistoryArchive(fileName)
+      if (result?.deleted) {
+        setConfirmArchiveDelete(null)
+        setNotification('Arsip dihapus permanen: ' + result.fileName)
+        setHistoryArchives(await electronAPI.getHistoryArchives())
+      }
+    } catch (err) {
+      setDeletingArchive(null)
+      setNotification('Gagal menghapus arsip: ' + err.message)
+    } finally {
+      setDeletingArchive(null)
+    }
+  }
 
   useEffect(() => {
     if (!notification) return
@@ -995,6 +1043,14 @@ function Control() {
               {exporting ? 'Mengekspor...' : 'Export PNG'}
             </button>
             <button onClick={() => electronAPI?.saveMatch()} className="bg-blue-500 text-white px-4 py-1.5 text-sm font-semibold rounded">Simpan</button>
+            <button
+              type="button"
+              onClick={() => handleExportHistoryCsv()}
+              disabled={exportingHistory}
+              className="bg-blue-700 text-white px-4 py-1.5 text-sm font-semibold rounded hover:bg-blue-800 active:bg-blue-900 disabled:cursor-not-allowed disabled:opacity-50"
+            >
+              {exportingHistory ? 'Mengekspor...' : 'Export History CSV'}
+            </button>
           </div>
         </div>
 
@@ -1017,7 +1073,39 @@ function Control() {
         </button>
 
         <h3 className="text-sm font-semibold text-gray-600 mb-1">History</h3>
+        <div className="flex gap-2 mb-2">
+          {confirmHistoryReset ? (
+            <>
+              <button
+                onClick={() => {
+                  setResettingHistory(true)
+                  electronAPI?.resetHistory()
+                }}
+                disabled={resettingHistory || history.length === 0}
+                className="bg-red-600 text-white px-3 py-1.5 text-xs font-semibold rounded disabled:cursor-not-allowed disabled:opacity-50"
+              >
+                {resettingHistory ? 'Mengarsipkan...' : 'Yakin reset?'}
+              </button>
+              <button
+                onClick={() => setConfirmHistoryReset(false)}
+                disabled={resettingHistory}
+                className="bg-gray-200 text-gray-700 px-3 py-1.5 text-xs font-semibold rounded disabled:cursor-not-allowed disabled:opacity-50"
+              >
+                Batal
+              </button>
+            </>
+          ) : (
+            <button
+              onClick={() => setConfirmHistoryReset(true)}
+              disabled={history.length === 0}
+              className="bg-red-600 text-white px-3 py-1.5 text-xs font-semibold rounded disabled:cursor-not-allowed disabled:opacity-50"
+            >
+              Reset History
+            </button>
+          )}
+        </div>
         <ul className="space-y-0.5 max-h-32 overflow-y-auto">
+          {history.length === 0 && <li className="text-xs text-gray-600">Belum ada history.</li>}
           {history.map((item) => {
             let text = ''
             if (item.action === 'add') text = `+${item.value} (${item.team_name})`
@@ -1026,9 +1114,73 @@ function Control() {
             else if (item.action === 'delete-team') text = `Hapus Tim: ${item.team_name}`
             else text = ''
             if (!text) return null
-            return <li key={item.id} className="text-xs text-gray-600">{text}</li>
+            const timestamp = new Date(item.created_at).toLocaleString('id-ID')
+            return <li key={item.id} className="text-xs text-gray-600">{text} · {timestamp}</li>
           })}
         </ul>
+        <h3 className="text-sm font-semibold text-gray-600 mt-4 mb-1">Arsip History</h3>
+        <ul className="space-y-1 max-h-40 overflow-y-auto" aria-label="Arsip history tersimpan">
+          {historyArchives.map((archive) => (
+            <li key={archive.file} className="flex items-center justify-between gap-2 bg-gray-50 px-3 py-2 rounded text-sm">
+              <div className="min-w-0">
+                <div className="truncate font-medium">{archive.file}</div>
+                <div className="text-xs text-gray-600">
+                  {archive.count == null ? 'Isi arsip tidak valid' : `${archive.count} baris`}
+                  {archive.size != null && ` · ${archive.size} byte`}
+                </div>
+              </div>
+              <div className="flex shrink-0 gap-2">
+                <button
+                  type="button"
+                  onClick={() => handleExportHistoryCsv(archive.file)}
+                  disabled={exportingHistory || archive.count == null || deletingArchive !== null}
+                  className="text-blue-700 text-xs font-semibold hover:underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-800 disabled:cursor-not-allowed disabled:opacity-50"
+                >
+                  Export CSV
+                </button>
+                {confirmArchiveDelete === archive.file ? (
+                  <>
+                    <button
+                      type="button"
+                      onClick={() => handleDeleteHistoryArchive(archive.file)}
+                      disabled={deletingArchive === archive.file}
+                      aria-label={`Hapus permanen ${archive.file}`}
+                      className="text-red-700 text-xs font-semibold hover:underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-red-800 disabled:cursor-not-allowed disabled:opacity-50"
+                    >
+                      {deletingArchive === archive.file ? 'Menghapus...' : 'Ya, hapus permanen'}
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setConfirmArchiveDelete(null)}
+                      disabled={deletingArchive === archive.file}
+                      className="text-gray-700 text-xs font-semibold hover:underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gray-700 disabled:cursor-not-allowed disabled:opacity-50"
+                    >
+                      Batal
+                    </button>
+                  </>
+                ) : (
+                  <button
+                    type="button"
+                    onClick={() => setConfirmArchiveDelete(archive.file)}
+                    disabled={deletingArchive !== null}
+                    aria-label={`Pilih hapus permanen ${archive.file}`}
+                    className="text-red-700 text-xs font-semibold hover:underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-red-800 disabled:cursor-not-allowed disabled:opacity-50"
+                  >
+                    Hapus
+                  </button>
+                )}
+              </div>
+            </li>
+          ))}
+          {historyArchives.length === 0 && (
+            <li className="text-xs text-gray-600">Belum ada arsip history.</li>
+          )}
+        </ul>
+        {confirmArchiveDelete && (
+          <p role="status" className="mt-2 text-xs text-red-800">
+            Arsip {confirmArchiveDelete} akan dihapus permanen. Tidak ada salinan pemulihan.
+          </p>
+        )}
       </div>
       </>)}
 
